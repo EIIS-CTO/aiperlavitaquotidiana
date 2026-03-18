@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI per la vita quotidiana — Corso gratuito per Soci Coop</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --olive: #A3B644; --olive-light: #C5D26E; --olive-dark: #7D8E2F;
+    --coop-red: #E2001A;
+    --white: #FFFFFF; --gray-50: #F7F7F6; --gray-100: #EFEFEE;
+    --gray-200: #D9D9D7; --gray-300: #B8B8B5; --gray-400: #8E8E8B;
+    --gray-500: #6B6B68; --gray-600: #4A4A48; --gray-700: #333332;
+    --gray-800: #1E1E1D; --gray-900: #111110;
+  }
+  body { font-family: 'Inter', sans-serif; color: var(--gray-800); background: var(--white); -webkit-font-smoothing: antialiased; }
+  .container { max-width: 1120px; margin: 0 auto; padding: 0 32px; }
+
+  /* Global Navigation */
+  .topnav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+    background: rgba(17,17,16,.97); backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255,255,255,.06);
+    height: 60px; display: flex; align-items: center; padding: 0 32px;
+  }
+  .topnav-inner { max-width: 1280px; width: 100%; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+  .topnav-brand { font-weight: 800; font-size: 17px; color: #FFF; text-decoration: none; }
+  .topnav-brand span { color: var(--olive); }
+  .topnav-links { display: flex; gap: 6px; }
+  .topnav-links a {
+    padding: 7px 16px; border-radius: 9999px; font-size: 13px; font-weight: 600;
+    text-decoration: none; color: #8E8E8B; transition: all .2s;
+  }
+  .topnav-links a:hover { color: #FFF; background: rgba(255,255,255,.06); }
+  .topnav-links a.active { color: #FFF; background: var(--olive); }
+
+  /* Page Header (landing) */
+  header {
+    position: fixed; top: 60px; left: 0; right: 0; z-index: 100;
+    background: rgba(255,255,255,0.96); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--gray-100);
+    height: 56px; display: flex; align-items: center;
+  }
+  header .container { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+  .logo { display: flex; align-items: center; gap: 20px; }
+  .logo-coop { font-size: 24px; font-weight: 900; color: var(--coop-red); letter-spacing: -1px; }
+  .logo-eiis { font-size: 18px; font-weight: 800; color: var(--gray-700); }
+  .logo-eiis span { color: var(--olive); }
+  .logo-divider { width: 1px; height: 24px; background: var(--gray-200); }
+  .header-cta { display: flex; align-items: center; gap: 24px; }
+  .header-cta a { font-size: 14px; font-weight: 500; color: var(--gray-500); text-decoration: none; }
+  .header-cta a:hover { color: var(--gray-900); }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 28px; border-radius: 9999px;
+    font-family: inherit; font-size: 15px; font-weight: 600;
+    border: none; cursor: pointer; transition: all 0.2s; text-decoration: none;
+  }
+  .btn-primary { background: var(--olive); color: var(--white); }
+  .btn-primary:hover { background: var(--olive-dark); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(163,182,68,0.3); }
+  .btn-secondary { background: var(--gray-900); color: var(--white); }
+  .btn-secondary:hover { background: var(--gray-700); }
+  .btn-outline { background: transparent; color: var(--gray-900); border: 2px solid var(--gray-200); }
+  .btn-outline:hover { border-color: var(--gray-900); }
+  .btn-lg { padding: 18px 40px; font-size: 17px; }
+  .btn-sm { padding: 10px 20px; font-size: 13px; }
+
+  /* Hero */
+  .hero {
+    padding: 190px 0 100px;
+    background: var(--gray-900);
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; top: -200px; right: -200px;
+    width: 600px; height: 600px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(163,182,68,0.08) 0%, transparent 70%);
+  }
+  .hero::after {
+    content: ''; position: absolute; bottom: -100px; left: -100px;
+    width: 400px; height: 400px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(163,182,68,0.05) 0%, transparent 70%);
+  }
+  .hero .container { position: relative; z-index: 1; }
+  .hero-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 64px; align-items: center; }
+  .hero-label {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 16px; border-radius: 9999px;
+    background: rgba(163,182,68,0.12); border: 1px solid rgba(163,182,68,0.2);
+    font-size: 13px; font-weight: 600; color: var(--olive-light);
+    margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-size: 52px; font-weight: 800; line-height: 1.08;
+    color: var(--white); margin-bottom: 20px;
+  }
+  .hero h1 span { color: var(--olive); }
+  .hero p { font-size: 18px; color: var(--gray-300); line-height: 1.6; margin-bottom: 36px; max-width: 520px; }
+  .hero-actions { display: flex; gap: 16px; align-items: center; margin-bottom: 40px; }
+  .hero-stats { display: flex; gap: 40px; }
+  .hero-stat { text-align: left; }
+  .hero-stat-num { font-size: 28px; font-weight: 800; color: var(--olive); }
+  .hero-stat-label { font-size: 13px; color: var(--gray-400); margin-top: 2px; }
+
+  /* Hero signup form */
+  .hero-form {
+    background: var(--gray-800); border-radius: 20px;
+    padding: 40px; border: 1px solid var(--gray-700);
+  }
+  .hero-form h3 { font-size: 22px; font-weight: 700; color: var(--white); margin-bottom: 6px; }
+  .hero-form p { font-size: 14px; color: var(--gray-400); margin-bottom: 24px; }
+  .form-group { margin-bottom: 16px; }
+  .form-label { display: block; font-size: 13px; font-weight: 600; color: var(--gray-300); margin-bottom: 6px; }
+  .form-input {
+    width: 100%; padding: 14px 18px; border: 2px solid var(--gray-600);
+    border-radius: 10px; background: var(--gray-900); color: var(--white);
+    font-family: inherit; font-size: 15px; outline: none; transition: border-color 0.2s;
+  }
+  .form-input::placeholder { color: var(--gray-500); }
+  .form-input:focus { border-color: var(--olive); }
+  .form-select {
+    width: 100%; padding: 14px 18px; border: 2px solid var(--gray-600);
+    border-radius: 10px; background: var(--gray-900); color: var(--gray-400);
+    font-family: inherit; font-size: 15px; outline: none;
+    appearance: none; cursor: pointer;
+  }
+  .form-submit { width: 100%; margin-top: 8px; justify-content: center; }
+  .form-note { font-size: 12px; color: var(--gray-500); margin-top: 12px; text-align: center; }
+
+  /* Trust bar */
+  .trust-bar {
+    background: var(--white); border-bottom: 1px solid var(--gray-100);
+    padding: 28px 0;
+  }
+  .trust-bar .container {
+    display: flex; align-items: center; justify-content: center; gap: 48px;
+  }
+  .trust-item {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 14px; color: var(--gray-500); font-weight: 500;
+  }
+  .trust-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+
+  /* Features */
+  .features { padding: 100px 0; }
+  .features-header { text-align: center; max-width: 640px; margin: 0 auto 64px; }
+  .section-label {
+    font-size: 13px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1.5px; color: var(--olive); margin-bottom: 12px;
+  }
+  .section-title { font-size: 40px; font-weight: 800; line-height: 1.15; color: var(--gray-900); margin-bottom: 16px; }
+  .section-subtitle { font-size: 17px; color: var(--gray-500); line-height: 1.6; }
+  .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+  .feature-card {
+    padding: 36px; border-radius: 16px; border: 1px solid var(--gray-100);
+    background: var(--white); transition: all 0.25s;
+  }
+  .feature-card:hover { box-shadow: 0 12px 32px rgba(0,0,0,0.08); transform: translateY(-3px); border-color: var(--gray-200); }
+  .feature-icon {
+    width: 52px; height: 52px; border-radius: 12px;
+    background: rgba(163,182,68,0.1); color: var(--olive);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; margin-bottom: 20px;
+  }
+  .feature-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  .feature-card p { font-size: 14px; color: var(--gray-500); line-height: 1.6; }
+
+  /* Modules */
+  .modules { padding: 100px 0; background: var(--gray-900); color: var(--white); }
+  .modules .section-title { color: var(--white); }
+  .modules-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+  .module-card {
+    padding: 28px; border-radius: 16px; background: var(--gray-800);
+    border: 1px solid var(--gray-700); transition: all 0.25s;
+    display: flex; flex-direction: column;
+  }
+  .module-card:hover { border-color: var(--olive); transform: translateY(-2px); }
+  .module-num {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: var(--olive); color: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 800; margin-bottom: 16px;
+  }
+  .module-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; line-height: 1.3; }
+  .module-card p { font-size: 13px; color: var(--gray-400); line-height: 1.5; flex: 1; }
+  .module-tag {
+    display: inline-block; margin-top: 16px; padding: 4px 10px;
+    border-radius: 9999px; font-size: 11px; font-weight: 600;
+    background: rgba(163,182,68,0.12); color: var(--olive-light);
+  }
+
+  /* Social Proof */
+  .social-proof { padding: 100px 0; background: var(--gray-50); }
+  .quotes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 48px; }
+  .quote-card {
+    background: var(--white); border-radius: 16px; padding: 32px;
+    border: 1px solid var(--gray-100);
+  }
+  .quote-text { font-size: 15px; line-height: 1.7; color: var(--gray-600); margin-bottom: 20px; font-style: italic; }
+  .quote-author { display: flex; align-items: center; gap: 12px; }
+  .quote-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--olive); color: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 16px;
+  }
+  .quote-name { font-weight: 600; font-size: 14px; }
+  .quote-role { font-size: 13px; color: var(--gray-400); }
+
+  /* CTA Final */
+  .cta-final { padding: 100px 0; }
+  .cta-box {
+    background: var(--gray-900); border-radius: 24px;
+    padding: 80px 48px; text-align: center; position: relative; overflow: hidden;
+  }
+  .cta-box::before {
+    content: ''; position: absolute; top: -100px; right: -100px;
+    width: 300px; height: 300px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(163,182,68,0.12) 0%, transparent 70%);
+  }
+  .cta-box .section-label { color: var(--olive-light); }
+  .cta-box h2 { font-size: 40px; font-weight: 800; color: var(--white); margin-bottom: 16px; line-height: 1.15; }
+  .cta-box h2 span { color: var(--olive); }
+  .cta-box p { font-size: 17px; color: var(--gray-300); margin-bottom: 36px; max-width: 500px; margin-left: auto; margin-right: auto; }
+  .cta-inline {
+    display: flex; gap: 12px; max-width: 440px; margin: 0 auto;
+    position: relative; z-index: 1;
+  }
+  .cta-inline input {
+    flex: 1; padding: 16px 22px; border: 2px solid var(--gray-600);
+    border-radius: 9999px; background: transparent; color: var(--white);
+    font-family: inherit; font-size: 15px; outline: none;
+  }
+  .cta-inline input::placeholder { color: var(--gray-500); }
+  .cta-inline input:focus { border-color: var(--olive); }
+
+  /* FAQ */
+  .faq { padding: 100px 0; background: var(--gray-50); }
+  .faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 900px; margin: 0 auto; }
+  .faq-item {
+    background: var(--white); border: 1px solid var(--gray-100);
+    border-radius: 12px; padding: 24px 28px;
+  }
+  .faq-item h4 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+  .faq-item p { font-size: 14px; color: var(--gray-500); line-height: 1.6; }
+
+  /* Footer */
+  footer {
+    background: var(--gray-900); color: var(--gray-400);
+    padding: 60px 0 32px;
+  }
+  .footer-top { display: flex; justify-content: space-between; align-items: start; margin-bottom: 40px; }
+  .footer-brand { font-size: 20px; font-weight: 800; color: var(--white); }
+  .footer-brand span { color: var(--olive); }
+  .footer-links { display: flex; gap: 32px; }
+  .footer-links a { color: var(--gray-400); text-decoration: none; font-size: 14px; }
+  .footer-links a:hover { color: var(--olive); }
+  .footer-bottom {
+    border-top: 1px solid var(--gray-700); padding-top: 24px;
+    display: flex; justify-content: space-between; font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+<!-- Global Nav -->
+<nav class="topnav">
+  <div class="topnav-inner">
+    <a href="index.html" class="topnav-brand">AI<span>vita</span></a>
+    <div class="topnav-links">
+      <a href="index.html">Home</a>
+      <a href="design-system.html">Design System</a>
+      <a href="landing-page.html" class="active">Landing Page</a>
+      <a href="social-media-mockups.html">Social Kit</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Header -->
+<header>
+  <div class="container">
+    <div class="logo">
+      <div class="logo-coop">coop</div>
+      <div class="logo-divider"></div>
+      <div class="logo-eiis">E<span>II</span>S</div>
+    </div>
+    <div class="header-cta">
+      <a href="#moduli">Il Percorso</a>
+      <a href="#faq">FAQ</a>
+      <button class="btn btn-primary btn-sm">Iscriviti Gratis</button>
+    </div>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <div class="hero-label">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          Corso gratuito per Soci Coop
+        </div>
+        <h1>AI per la<br><span>vita quotidiana</span></h1>
+        <p>L'intelligenza artificiale come alleato quotidiano: strumenti pratici per semplificare la vita, risparmiare tempo e denaro.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary btn-lg">Inizia il Percorso</button>
+          <button class="btn btn-outline btn-lg" style="color: var(--gray-300); border-color: var(--gray-600);">Scopri i Moduli</button>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="hero-stat-num">5</div>
+            <div class="hero-stat-label">Moduli didattici</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-num">6</div>
+            <div class="hero-stat-label">Settimane</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-num">100%</div>
+            <div class="hero-stat-label">Online</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-num">0&euro;</div>
+            <div class="hero-stat-label">Costo</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Signup Form -->
+      <div class="hero-form">
+        <h3>Iscriviti ora</h3>
+        <p>Accedi al Digital Campus EIIS in pochi secondi.</p>
+        <div class="form-group">
+          <label class="form-label">Nome</label>
+          <input class="form-input" type="text" placeholder="Il tuo nome">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-input" type="email" placeholder="nome@email.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cooperativa di appartenenza</label>
+          <select class="form-select">
+            <option>Seleziona la tua Coop...</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-lg form-submit">Inizia Gratis &rarr;</button>
+        <p class="form-note">Nessun costo. Servono solo curiosit&agrave; e una connessione internet.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Trust Bar -->
+<div class="trust-bar">
+  <div class="container">
+    <div class="trust-item">
+      <div class="trust-icon" style="background: rgba(163,182,68,0.1); color: var(--olive);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      Privacy garantita
+    </div>
+    <div class="trust-item">
+      <div class="trust-icon" style="background: rgba(163,182,68,0.1); color: var(--olive);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      </div>
+      Accessibile 24/7
+    </div>
+    <div class="trust-item">
+      <div class="trust-icon" style="background: rgba(163,182,68,0.1); color: var(--olive);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      Per tutti, nessun prerequisito
+    </div>
+    <div class="trust-item">
+      <div class="trust-icon" style="background: rgba(226,0,26,0.08); color: var(--coop-red);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </div>
+      Un progetto Coop + EIIS
+    </div>
+  </div>
+</div>
+
+<!-- Features -->
+<section class="features">
+  <div class="container">
+    <div class="features-header">
+      <p class="section-label">Perch&eacute; questo corso</p>
+      <h2 class="section-title">L'AI non &egrave; roba da ingegneri</h2>
+      <p class="section-subtitle">&Egrave; uno strumento per tutti. Impara a usarlo per risparmiare tempo, gestire meglio le finanze e vivere in modo pi&ugrave; sostenibile.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        </div>
+        <h3>Pratico, non teorico</h3>
+        <p>Niente lezioni accademiche. Impari facendo, con esercizi concreti che puoi applicare subito nella vita di tutti i giorni.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <h3>Storie vere</h3>
+        <p>Ogni modulo segue un "protagonista" reale: un'infermiera, uno studente, un eco-chef. Le loro sfide sono le tue.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h3>Sicurezza al primo posto</h3>
+        <p>Impari a proteggerti dalle truffe digitali, dal phishing e dai deepfake. Trasforma la diffidenza in competenza critica.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <h3>Linguaggio semplice</h3>
+        <p>Zero gergo tecnico. Spieghiamo tutto come farebbe un amico paziente, con esempi dalla vita quotidiana.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        </div>
+        <h3>I tuoi tempi</h3>
+        <p>Moduli sbloccati ogni settimana, disponibili per sempre. Vai avanti al tuo ritmo, quando e dove vuoi.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <h3>AI integrata</h3>
+        <p>Sperimenti direttamente gli strumenti di AI all'interno del campus digitale, mentre impari ad usarli.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Modules -->
+<section class="modules" id="moduli">
+  <div class="container">
+    <div style="text-align: center; max-width: 640px; margin: 0 auto 64px;">
+      <p class="section-label" style="color: var(--olive-light);">Il Percorso</p>
+      <h2 class="section-title" style="color: var(--white);">5 moduli, 6 settimane</h2>
+      <p class="section-subtitle" style="color: var(--gray-400);">Un percorso progressivo dalla scoperta degli strumenti alla padronanza quotidiana dell'AI.</p>
+    </div>
+    <div class="modules-grid">
+      <div class="module-card">
+        <div class="module-num">1</div>
+        <h3>La cassetta degli attrezzi</h3>
+        <p>Setup e panoramica di ChatGPT, Claude, Gemini, Perplexity. Le regole base del prompt engineering.</p>
+        <span class="module-tag">Intro & Setup</span>
+      </div>
+      <div class="module-card">
+        <div class="module-num">2</div>
+        <h3>Burocrazia e budget</h3>
+        <p>Gestire documenti legali e tenere sotto controllo le spese con l'assistente AI tascabile.</p>
+        <span class="module-tag">Risparmio</span>
+      </div>
+      <div class="module-card">
+        <div class="module-num">3</div>
+        <h3>Cucina e benessere</h3>
+        <p>Ricette zero-waste, sostituti intelligenti e pianificazione della spesa sostenibile.</p>
+        <span class="module-tag">Sostenibilit&agrave;</span>
+      </div>
+      <div class="module-card">
+        <div class="module-num">4</div>
+        <h3>Creativit&agrave; e comunit&agrave;</h3>
+        <p>Organizzare eventi, creare materiali visivi e supportare il volontariato con l'AI.</p>
+        <span class="module-tag">Inclusione</span>
+      </div>
+      <div class="module-card">
+        <div class="module-num">5</div>
+        <h3>Difesa personale digitale</h3>
+        <p>Riconoscere deepfake, difendersi dal phishing e verificare le notizie online.</p>
+        <span class="module-tag">Sicurezza</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Social Proof -->
+<section class="social-proof">
+  <div class="container">
+    <div style="text-align: center;">
+      <p class="section-label">Testimonianze</p>
+      <h2 class="section-title">Persone come te, gi&agrave; in cammino</h2>
+    </div>
+    <div class="quotes-grid">
+      <div class="quote-card">
+        <p class="quote-text">&laquo;Non sapevo neanche cosa fosse un prompt. Ora uso l'AI per scrivere le lettere al condominio e mi sento pi&ugrave; sicura.&raquo;</p>
+        <div class="quote-author">
+          <div class="quote-avatar">MR</div>
+          <div><div class="quote-name">Maria R.</div><div class="quote-role">Infermiera, 54 anni</div></div>
+        </div>
+      </div>
+      <div class="quote-card">
+        <p class="quote-text">&laquo;Fotografo gli scontrini e l'AI mi fa il budget del mese. Geniale. Non tocco pi&ugrave; un foglio di calcolo.&raquo;</p>
+        <div class="quote-author">
+          <div class="quote-avatar">LB</div>
+          <div><div class="quote-name">Luca B.</div><div class="quote-role">Studente, 22 anni</div></div>
+        </div>
+      </div>
+      <div class="quote-card">
+        <p class="quote-text">&laquo;Avevo avanzi in frigo e zero idee. L'AI mi ha suggerito una ricetta buonissima e a spreco zero.&raquo;</p>
+        <div class="quote-author">
+          <div class="quote-avatar">AG</div>
+          <div><div class="quote-name">Anna G.</div><div class="quote-role">Casalinga, 47 anni</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+  <div class="container">
+    <div style="text-align: center; margin-bottom: 48px;">
+      <p class="section-label">FAQ</p>
+      <h2 class="section-title">Domande frequenti</h2>
+    </div>
+    <div class="faq-grid">
+      <div class="faq-item">
+        <h4>Devo essere esperto di tecnologia?</h4>
+        <p>Assolutamente no. Il corso &egrave; pensato per chi non ha mai usato l'intelligenza artificiale. Basta un computer o tablet e una connessione internet.</p>
+      </div>
+      <div class="faq-item">
+        <h4>Quanto costa il corso?</h4>
+        <p>Il corso &egrave; completamente gratuito per tutti i soci Coop.</p>
+      </div>
+      <div class="faq-item">
+        <h4>Quanto dura?</h4>
+        <p>6 settimane con 5 moduli asincroni. Ogni modulo si sblocca settimanalmente e resta disponibile per sempre.</p>
+      </div>
+      <div class="faq-item">
+        <h4>Posso seguirlo da smartphone?</h4>
+        <p>S&igrave;, il Digital Campus &egrave; accessibile da qualsiasi dispositivo con connessione internet.</p>
+      </div>
+      <div class="faq-item">
+        <h4>I miei dati sono al sicuro?</h4>
+        <p>La privacy &egrave; una priorit&agrave;. Nel Modulo 1 impari anche quali dati non condividere mai con l'AI.</p>
+      </div>
+      <div class="faq-item">
+        <h4>Posso contribuire al corso?</h4>
+        <p>S&igrave;! I partecipanti del primo intake contribuiranno a definire 3 moduli aggiuntivi sui temi che pi&ugrave; interessano.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Final CTA -->
+<section class="cta-final">
+  <div class="container">
+    <div class="cta-box">
+      <p class="section-label">Pronto a iniziare?</p>
+      <h2>L'AI &egrave; per <span>tutti</span>.<br>Anche per te.</h2>
+      <p>Iscriviti in 30 secondi e inizia a scoprire come l'intelligenza artificiale pu&ograve; semplificarti la vita.</p>
+      <div class="cta-inline">
+        <input type="email" placeholder="La tua email...">
+        <button class="btn btn-primary btn-lg">Iscriviti Gratis</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    <div class="footer-top">
+      <div>
+        <div class="footer-brand">AI per la <span>vita quotidiana</span></div>
+        <p style="margin-top: 8px; font-size: 14px; max-width: 320px; line-height: 1.6;">Un progetto di Coop Italia ed EIIS per la democratizzazione dell'innovazione.</p>
+      </div>
+      <div class="footer-links">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Cookie Policy</a>
+        <a href="#">Contatti</a>
+        <a href="#">EIIS.eu</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 Coop Italia &times; EIIS. Tutti i diritti riservati.</span>
+      <span>Proposta P-39/2025</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
