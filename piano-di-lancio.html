@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Piano di Lancio — AI per la vita quotidiana</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --red:#E2001A;--red-dark:#B5001A;--red-light:#FF1A33;
+  --olive:#A3B644;--olive-light:#C5D26E;--olive-dark:#7D8E2F;
+  --white:#FFF;--g50:#F7F7F6;--g100:#EFEFEE;--g200:#D9D9D7;--g300:#B8B8B5;
+  --g400:#8E8E8B;--g500:#6B6B68;--g600:#4A4A48;--g700:#333332;--g800:#1E1E1D;--g900:#111110;
+  --font:'Inter',system-ui,sans-serif;
+}
+body{font-family:var(--font);background:var(--g50);color:var(--g800);-webkit-font-smoothing:antialiased;line-height:1.5}
+
+/* NAV */
+.topnav{
+  position:sticky;top:0;z-index:200;
+  background:rgba(17,17,16,.97);backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(255,255,255,.06);
+  height:60px;display:flex;align-items:center;padding:0 32px;
+}
+.topnav-inner{max-width:1280px;width:100%;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.topnav-brand{font-weight:800;font-size:17px;color:var(--white);text-decoration:none}
+.topnav-brand span{color:var(--olive)}
+.topnav-links{display:flex;gap:6px}
+.topnav-links a{
+  padding:7px 16px;border-radius:9999px;font-size:13px;font-weight:600;
+  text-decoration:none;color:var(--g400);transition:all .2s;
+}
+.topnav-links a:hover{color:var(--white);background:rgba(255,255,255,.06)}
+.topnav-links a.active{color:var(--white);background:var(--red)}
+
+/* PAGE HERO */
+.page-hero{
+  background:var(--g900);padding:72px 32px 64px;
+  position:relative;overflow:hidden;
+}
+.page-hero::before{
+  content:'';position:absolute;top:-180px;right:-100px;
+  width:700px;height:500px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(226,0,26,.07) 0%,transparent 70%);pointer-events:none;
+}
+.page-hero::after{
+  content:'';position:absolute;bottom:-100px;left:-50px;
+  width:500px;height:350px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(163,182,68,.05) 0%,transparent 70%);pointer-events:none;
+}
+.hero-inner{max-width:1120px;margin:0 auto;position:relative;z-index:1;}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 14px;border-radius:9999px;
+  background:rgba(226,0,26,.12);border:1px solid rgba(226,0,26,.2);
+  font-size:12px;font-weight:700;color:#FF6B7A;letter-spacing:.06em;text-transform:uppercase;
+  margin-bottom:24px;
+}
+.page-hero h1{font-size:48px;font-weight:800;color:var(--white);line-height:1.06;margin-bottom:16px;max-width:780px}
+.page-hero h1 span{color:var(--red)}
+.page-hero p{font-size:18px;color:var(--g400);max-width:640px;line-height:1.65;margin-bottom:40px}
+.hero-meta{display:flex;gap:40px;flex-wrap:wrap}
+.meta-item{display:flex;flex-direction:column;gap:4px}
+.meta-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--g500)}
+.meta-value{font-size:15px;font-weight:700;color:var(--white)}
+
+/* LAYOUT */
+.page-body{max-width:1120px;margin:0 auto;padding:56px 32px 80px;display:grid;grid-template-columns:1fr 300px;gap:48px;align-items:start}
+
+/* MAIN */
+.main-col{}
+
+/* SECTION */
+.section{margin-bottom:64px}
+.section-header{display:flex;align-items:center;gap:14px;margin-bottom:32px;padding-bottom:16px;border-bottom:2px solid var(--g200)}
+.section-num{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--red);color:var(--white);
+  font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.section-title{font-size:24px;font-weight:800;color:var(--g900)}
+
+/* TIMELINE */
+.timeline{position:relative;padding-left:0}
+.tl-item{
+  display:grid;grid-template-columns:120px 1fr;gap:0;
+  margin-bottom:0;position:relative;
+}
+.tl-date{
+  padding:28px 24px 28px 0;
+  font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--g500);text-align:right;padding-top:32px;
+  border-right:2px solid var(--g200);
+}
+.tl-item.active .tl-date{color:var(--red)}
+.tl-content{
+  padding:20px 0 20px 28px;position:relative;
+}
+.tl-content::before{
+  content:'';position:absolute;left:-7px;top:30px;
+  width:12px;height:12px;border-radius:50%;
+  background:var(--g200);border:2px solid var(--g50);
+}
+.tl-item.active .tl-content::before{background:var(--red);box-shadow:0 0 0 4px rgba(226,0,26,.15)}
+.tl-item.done .tl-content::before{background:var(--olive)}
+.tl-phase{
+  font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+  margin-bottom:6px;
+}
+.tl-item.active .tl-phase{color:var(--red)}
+.tl-item.done .tl-phase{color:var(--olive-dark)}
+.tl-item:not(.active):not(.done) .tl-phase{color:var(--g400)}
+.tl-head{font-size:17px;font-weight:800;color:var(--g900);margin-bottom:8px}
+.tl-body{font-size:14px;color:var(--g500);line-height:1.65}
+.tl-tasks{margin-top:12px;display:flex;flex-direction:column;gap:6px}
+.tl-task{
+  display:flex;align-items:flex-start;gap:8px;
+  font-size:13px;color:var(--g600);line-height:1.5;
+}
+.tl-task::before{
+  content:'';width:6px;height:6px;border-radius:50%;
+  background:var(--g300);flex-shrink:0;margin-top:6px;
+}
+.tl-item.active .tl-task::before{background:var(--red)}
+
+/* MODULE CARDS */
+.modules-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.mod-card{
+  background:var(--white);border:1px solid var(--g200);
+  border-radius:16px;padding:24px;
+  transition:all .25s;position:relative;overflow:hidden;
+}
+.mod-card:hover{border-color:var(--red);box-shadow:0 8px 32px rgba(226,0,26,.08);transform:translateY(-2px)}
+.mod-num{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:32px;height:32px;border-radius:50%;
+  background:rgba(226,0,26,.08);color:var(--red);
+  font-size:14px;font-weight:800;margin-bottom:14px;
+}
+.mod-title{font-size:15px;font-weight:800;color:var(--g900);margin-bottom:8px;line-height:1.3}
+.mod-persona{font-size:12px;font-weight:600;color:var(--olive-dark);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em}
+.mod-desc{font-size:13px;color:var(--g500);line-height:1.6}
+.mod-badge{
+  position:absolute;top:16px;right:16px;
+  padding:3px 10px;border-radius:9999px;
+  font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+}
+.badge-core{background:rgba(226,0,26,.08);color:var(--red)}
+.badge-extra{background:rgba(163,182,68,.1);color:var(--olive-dark)}
+
+/* KPI GRID */
+.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.kpi-card{
+  background:var(--white);border:1px solid var(--g200);border-radius:16px;padding:24px;text-align:center;
+}
+.kpi-num{font-size:36px;font-weight:900;color:var(--red);line-height:1;margin-bottom:4px}
+.kpi-unit{font-size:14px;font-weight:600;color:var(--g500)}
+.kpi-label{font-size:12px;color:var(--g400);margin-top:6px;line-height:1.4}
+
+/* MESSAGING */
+.msg-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.msg-card{
+  background:var(--white);border:1px solid var(--g200);border-radius:16px;padding:24px;
+}
+.msg-icon{font-size:28px;margin-bottom:12px}
+.msg-barrier{font-size:12px;font-weight:700;color:var(--g400);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.msg-quote{font-size:14px;color:var(--g600);font-style:italic;margin-bottom:12px;line-height:1.6}
+.msg-arrow{color:var(--olive);font-size:18px;margin-bottom:8px}
+.msg-response{font-size:14px;font-weight:600;color:var(--g800);line-height:1.5}
+
+/* CHANNEL TABLE */
+.ch-table{width:100%;border-collapse:collapse}
+.ch-table th{
+  text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--g500);padding:10px 16px;background:var(--g100);
+}
+.ch-table th:first-child{border-radius:10px 0 0 0}
+.ch-table th:last-child{border-radius:0 10px 0 0}
+.ch-table td{
+  padding:14px 16px;font-size:14px;color:var(--g700);
+  border-bottom:1px solid var(--g100);vertical-align:top;
+}
+.ch-table tr:last-child td{border-bottom:none}
+.ch-table tr:hover td{background:rgba(163,182,68,.03)}
+.ch-name{font-weight:700;color:var(--g900)}
+.ch-tag{
+  display:inline-block;padding:2px 8px;border-radius:9999px;
+  font-size:10px;font-weight:700;margin-right:4px;
+}
+.tag-social{background:rgba(59,130,246,.08);color:#3B82F6}
+.tag-onsite{background:rgba(163,182,68,.1);color:var(--olive-dark)}
+.tag-email{background:rgba(226,0,26,.08);color:var(--red)}
+.tag-digital{background:rgba(168,85,247,.08);color:#A855F7}
+
+/* SIDEBAR */
+.sidebar{display:flex;flex-direction:column;gap:24px}
+.side-card{
+  background:var(--white);border:1px solid var(--g200);border-radius:20px;padding:24px;
+  position:sticky;top:80px;
+}
+.side-title{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--g900);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--g100)}
+.side-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--g100);font-size:13px}
+.side-row:last-child{border-bottom:none}
+.side-row-label{color:var(--g500);font-weight:500}
+.side-row-val{font-weight:700;color:var(--g900)}
+.side-row-val.red{color:var(--red)}
+.side-row-val.green{color:var(--olive-dark)}
+
+.phase-list{display:flex;flex-direction:column;gap:10px}
+.phase-chip{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;border-radius:10px;
+  background:var(--g50);border:1px solid var(--g100);
+  font-size:12px;
+}
+.phase-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.phase-name{font-weight:700;color:var(--g800);flex:1}
+.phase-dates{font-size:11px;color:var(--g400)}
+
+.deliverables{display:flex;flex-direction:column;gap:8px}
+.del-item{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:10px 12px;border-radius:10px;background:var(--g50);
+  font-size:12px;color:var(--g700);line-height:1.4;
+}
+.del-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+.del-text{font-weight:500}
+.del-date{font-size:11px;color:var(--g400);margin-top:2px}
+
+/* FOOTER */
+.page-footer{
+  background:var(--g900);padding:36px 32px;text-align:center;
+  font-size:13px;color:var(--g500);border-top:1px solid rgba(255,255,255,.04);
+}
+.page-footer strong{color:var(--white)}
+.page-footer span{color:var(--olive)}
+
+/* PILLS */
+.pill{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 12px;border-radius:9999px;
+  font-size:12px;font-weight:600;
+}
+.pill-red{background:rgba(226,0,26,.08);color:var(--red);border:1px solid rgba(226,0,26,.15)}
+.pill-green{background:rgba(163,182,68,.1);color:var(--olive-dark);border:1px solid rgba(163,182,68,.15)}
+.pill-gray{background:var(--g100);color:var(--g500);border:1px solid var(--g200)}
+
+/* CALLOUT */
+.callout{
+  background:linear-gradient(135deg,rgba(226,0,26,.06) 0%,rgba(163,182,68,.04) 100%);
+  border:1px solid rgba(226,0,26,.12);border-radius:16px;
+  padding:24px 28px;margin:24px 0;
+}
+.callout-head{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--red);margin-bottom:8px}
+.callout p{font-size:14px;color:var(--g700);line-height:1.65}
+.callout strong{color:var(--g900)}
+
+/* SOCIAL FORMATS */
+.social-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.soc-card{
+  background:var(--white);border:1px solid var(--g200);border-radius:14px;padding:18px;
+  display:flex;flex-direction:column;gap:8px;
+}
+.soc-platform{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.soc-formats{display:flex;flex-direction:column;gap:4px}
+.soc-fmt{font-size:12px;color:var(--g600);display:flex;align-items:center;gap:6px}
+.soc-fmt::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--g300);flex-shrink:0}
+.soc-timing{font-size:11px;color:var(--g400);margin-top:4px;padding-top:8px;border-top:1px solid var(--g100)}
+
+@media(max-width:900px){
+  .page-body{grid-template-columns:1fr}
+  .modules-grid,.kpi-grid,.msg-grid,.social-grid{grid-template-columns:1fr}
+  .page-hero h1{font-size:36px}
+  .tl-item{grid-template-columns:90px 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="topnav">
+  <div class="topnav-inner">
+    <a href="index.html" class="topnav-brand">AI<span>vita</span></a>
+    <div class="topnav-links">
+      <a href="index.html">Home</a>
+      <a href="piano-di-lancio.html" class="active">Piano di Lancio</a>
+      <a href="landing-page.html">Landing Page</a>
+      <a href="social-kit.html">Social Kit</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="page-hero">
+  <div class="hero-inner">
+    <div class="hero-badge">Documento Strategico</div>
+    <h1>Piano di Lancio<br><span>AI per la vita quotidiana</span></h1>
+    <p>Strategia completa di comunicazione, timeline operativa, moduli formativi e KPI per il programma Coop × EIIS. Maggio — Dicembre 2026.</p>
+    <div class="hero-meta">
+      <div class="meta-item">
+        <span class="meta-label">Partner</span>
+        <span class="meta-value">Coop Italia × EIIS</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Target</span>
+        <span class="meta-value">Soci Coop (non esperti di AI)</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Obiettivo partecipanti</span>
+        <span class="meta-value">Fino a 10.000</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Durata piattaforma</span>
+        <span class="meta-value">Max 2 anni</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Formato</span>
+        <span class="meta-value">100% Online · Digital Campus EIIS</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="page-body">
+
+  <!-- MAIN COLUMN -->
+  <div class="main-col">
+
+    <!-- 1. CONTESTO & OBIETTIVO -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">1</div>
+        <h2 class="section-title">Contesto &amp; Obiettivo Strategico</h2>
+      </div>
+
+      <p style="font-size:16px;color:var(--g700);line-height:1.75;margin-bottom:20px">
+        Dopo il successo di <strong>"AI for Food"</strong>, EIIS e Coop lanciano un nuovo percorso formativo con una missione chiara: <strong>democratizzare l'accesso all'Intelligenza Artificiale</strong> per i soci Coop, con particolare attenzione alla fascia di popolazione più adulta e meno tecnologica.
+      </p>
+
+      <div class="callout">
+        <div class="callout-head">La sfida da abbattere</div>
+        <p>L'AI è spesso percepita come <strong>complessa</strong> ("È roba per ingegneri"), <strong>distante</strong> ("A me non serve") o <strong>minacciosa</strong> ("È pericolosa per la privacy"). Il programma trasforma questa diffidenza in curiosità e la complessità in utilità pratica.</p>
+      </div>
+
+      <div class="msg-grid" style="margin-top:24px">
+        <div class="msg-card">
+          <div class="msg-icon">😰</div>
+          <div class="msg-barrier">Barriera 1</div>
+          <div class="msg-quote">"È roba per ingegneri, non fa per me."</div>
+          <div class="msg-arrow">↓</div>
+          <div class="msg-response">Protagonisti "inesperti" che imparano in diretta, senza barriere tecniche.</div>
+        </div>
+        <div class="msg-card">
+          <div class="msg-icon">😶</div>
+          <div class="msg-barrier">Barriera 2</div>
+          <div class="msg-quote">"A me non serve, la mia vita va bene così."</div>
+          <div class="msg-arrow">↓</div>
+          <div class="msg-response">Casi d'uso pratici: risparmiare tempo, denaro, ridurre lo stress quotidiano.</div>
+        </div>
+        <div class="msg-card">
+          <div class="msg-icon">😨</div>
+          <div class="msg-barrier">Barriera 3</div>
+          <div class="msg-quote">"È pericolosa per la mia privacy e il lavoro."</div>
+          <div class="msg-arrow">↓</div>
+          <div class="msg-response">Modulo dedicato alla difesa digitale e all'uso etico e consapevole dell'AI.</div>
+        </div>
+        <div class="msg-card">
+          <div class="msg-icon">🤝</div>
+          <div class="msg-barrier">Valore Coop</div>
+          <div class="msg-quote">"L'innovazione deve essere accessibile a tutti."</div>
+          <div class="msg-arrow">↓</div>
+          <div class="msg-response">Un benefit esclusivo per i soci: formazione gratuita, pratica, inclusiva.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. TIMELINE OPERATIVA -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">2</div>
+        <h2 class="section-title">Timeline Operativa 2026</h2>
+      </div>
+
+      <div class="timeline">
+
+        <!-- FASE INGAGGIO -->
+        <div class="tl-item active">
+          <div class="tl-date">Mag 2026</div>
+          <div class="tl-content">
+            <div class="tl-phase">Fase 1 · Ingaggio &amp; Promozione</div>
+            <div class="tl-head">Lancio campagna di comunicazione</div>
+            <div class="tl-body">Avvio della fase promozionale su tutti i canali. Produzione e distribuzione dei materiali creativi per i punti vendita Coop e le piattaforme social.</div>
+            <div class="tl-tasks">
+              <div class="tl-task">Produzione materiali social (Instagram, Facebook, LinkedIn, TikTok)</div>
+              <div class="tl-task">Distribuzione materiali fisici nei punti vendita Coop (totem, volantini, roll-up)</div>
+              <div class="tl-task">Attivazione campagne ADV digitali sui canali Coop</div>
+              <div class="tl-task">Newsletter dedicata ai soci con anteprima esclusiva</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LANDING PAGE -->
+        <div class="tl-item active">
+          <div class="tl-date">15 Mag</div>
+          <div class="tl-content">
+            <div class="tl-phase">Fase 1 · Digital</div>
+            <div class="tl-head">Go-live Landing Page &amp; Pre-iscrizioni</div>
+            <div class="tl-body">Pubblicazione della mini landing page con tutti i dettagli del percorso formativo, le tempistiche di accesso e il form di pre-iscrizione per i soci Coop.</div>
+            <div class="tl-tasks">
+              <div class="tl-task">Landing page live con hero, moduli, FAQ e CTA di registrazione</div>
+              <div class="tl-task">Apertura lista d'attesa / pre-iscrizioni</div>
+              <div class="tl-task">Email di conferma automatica ai pre-iscritti</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 1° INTAKE APERTURA -->
+        <div class="tl-item">
+          <div class="tl-date">15 Giu</div>
+          <div class="tl-content">
+            <div class="tl-phase">Fase 2 · 1° Intake</div>
+            <div class="tl-head">Apertura accessi &amp; Modulo 1</div>
+            <div class="tl-body">Invio credenziali ai partecipanti del 1° intake. Sblocco del primo modulo sul Digital Campus EIIS.</div>
+            <div class="tl-tasks">
+              <div class="tl-task"><strong>Modulo 1:</strong> La cassetta degli attrezzi — ChatGPT, Gemini, Claude, prompt engineering, privacy</div>
+              <div class="tl-task">Email di benvenuto + tutorial di accesso alla piattaforma</div>
+              <div class="tl-task">Attivazione community / spazio di confronto dedicato</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-date">22 Giu</div>
+          <div class="tl-content">
+            <div class="tl-phase">Fase 2 · 1° Intake</div>
+            <div class="tl-head">Rilascio Modulo 2</div>
+            <div class="tl-body">Sblocco settimanale del secondo modulo. Comunicazione di reminder ai partecipanti.</div>
+            <div class="tl-tasks">
+              <div class="tl-task"><strong>Modulo 2:</strong> Semplificare la burocrazia e gestire il budget — documenti legali, fogli spese, AI assistente</div>
+              <div class="tl-task">Post social "questo è ciò che impari questa settimana"</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-date">29 Giu</div>
+          <div class="tl-content">
+            <div class="tl-phase">Fase 2 · 1° Intake</div>
+            <div class="tl-head">Rilascio Modulo 3</div>
+            <div class="tl-body">Terzo modulo settimanale focalizzato su sostenibilità alimentare e benessere.</div>
+            <div class="tl-tasks">
+              <div class="tl-task"><strong>Modulo 3:</strong> Sostenibilità in cucina e benessere — ricette zero-waste, spesa intelligente, benessere</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-date">6 Lug</div>
+          <div class="tl-content">
+            <div class="tl-phase">Fase 2 · Fine 1° Intake</div>
+            <div class="tl-head">Rilascio Modulo 4 &amp; Conclusione 1° Intake</div>
+            <div class="tl-body">Ultimo modulo del primo intake. Apertura del questionario di feedback per la co-creazione dei moduli aggiuntivi.</div>
+            <div class="tl-tasks">
+              <div class="tl-task"><strong>Modulo 4:</strong> Partecipazione, creatività e comunità — eventi, locandine AI, volontariato</div>
+              <div class="tl-task">Invio survey di valutazione e raccolta richieste per moduli aggiuntivi</div>
+              <div class="tl-task">Celebrazione: post social con statistiche del 1° intake</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FEEDBACK -->
+        <div class="tl-item">
+          <div class="tl-date">Lug–Ago</div>
+          <div class="tl-content">
+            <div class="tl-phase">Fase 3 · Co-creazione</div>
+            <div class="tl-head">Raccolta feedback &amp; Definizione moduli aggiuntivi</div>
+            <div class="tl-body">I partecipanti del 1° intake indicano ad EIIS i 3 argomenti che vorrebbero approfondire. I contenuti vengono co-progettati con la community.</div>
+            <div class="tl-tasks">
+              <div class="tl-task">Survey online ai partecipanti del 1° intake (metà luglio–metà agosto)</div>
+              <div class="tl-task">Analisi dati e definizione dei 3 temi aggiuntivi con EIIS</div>
+              <div class="tl-task">Comunicazione ai partecipanti dei temi scelti (storytelling di co-creazione)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SVILUPPO MODULI -->
+        <div class="tl-item">
+          <div class="tl-date">Ago–Set</div>
+          <div class="tl-content">
+            <div class="tl-phase">Fase 3 · Produzione</div>
+            <div class="tl-head">Sviluppo 3 moduli aggiuntivi</div>
+            <div class="tl-body">EIIS produce i 3 moduli aggiuntivi (Moduli 5→7/8) basati sulle richieste dei partecipanti. Il Digital Campus passa da 5 a 8 moduli complessivi.</div>
+            <div class="tl-tasks">
+              <div class="tl-task">Produzione video, quiz, assignment e interazioni AI per i 3 nuovi moduli (fine agosto–fine settembre)</div>
+              <div class="tl-task">Integrazione sul Digital Campus EIIS</div>
+              <div class="tl-task">QA e test della piattaforma completa</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2° INTAKE -->
+        <div class="tl-item">
+          <div class="tl-date">5 Ott</div>
+          <div class="tl-content">
+            <div class="tl-phase">Fase 4 · 2° Intake</div>
+            <div class="tl-head">Apertura 2° intake — Digital Campus completo</div>
+            <div class="tl-body">Accesso al corso con gli 8 moduli completi. Il Digital Campus assume natura "permanente" e rimane disponibile fino a 10.000 partecipanti totali per un massimo di 2 anni.</div>
+            <div class="tl-tasks">
+              <div class="tl-task">Nuova campagna di comunicazione per il 2° intake</div>
+              <div class="tl-task">Accesso per vecchi e nuovi iscritti a tutti i moduli + materiali didattici interattivi</div>
+              <div class="tl-task">Sblocco Modulo 7 (primo dei nuovi)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUCCESSIVI INTAKE -->
+        <div class="tl-item">
+          <div class="tl-date">Ott 26+</div>
+          <div class="tl-content">
+            <div class="tl-phase">Fase 4 · Permanenza</div>
+            <div class="tl-head">Successivi intake — fino a 10.000 partecipanti</div>
+            <div class="tl-body">Apertura ciclica a nuovi partecipanti. EIIS garantisce l'accesso e gestisce l'assistenza in modalità "light" (credenziali, supporto tecnico base, monitoraggio).</div>
+            <div class="tl-tasks">
+              <div class="tl-task">Cicli di ingresso aperti a discrezione di Coop</div>
+              <div class="tl-task">Manutenzione e aggiornamento contenuti (max 2 anni)</div>
+              <div class="tl-task">Reporting periodico a Coop su iscrizioni, completamenti e NPS</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /timeline -->
+    </div>
+
+    <!-- 3. PROGRAMMA FORMATIVO -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">3</div>
+        <h2 class="section-title">Programma Formativo — 5+3 Moduli</h2>
+      </div>
+
+      <p style="font-size:15px;color:var(--g600);margin-bottom:24px;line-height:1.7">
+        Il percorso utilizza <strong>personas narrative</strong> (avatar AI) che affrontano sfide quotidiane reali. Ogni modulo mostra una soluzione concreta prima di spiegare il "come". L'approccio garantisce engagement anche per i non esperti.
+      </p>
+
+      <div class="modules-grid">
+
+        <div class="mod-card">
+          <div class="mod-badge badge-core">1° Intake</div>
+          <div class="mod-num">1</div>
+          <div class="mod-title">La cassetta degli attrezzi</div>
+          <div class="mod-persona">Intro &amp; Setup</div>
+          <div class="mod-desc">Panoramica degli strumenti gratuiti (ChatGPT, Gemini, Claude, Perplexity), prompt engineering base, privacy e sicurezza dei dati. Pillole tech opzionali per chi vuole approfondire.</div>
+        </div>
+
+        <div class="mod-card">
+          <div class="mod-badge badge-core">1° Intake</div>
+          <div class="mod-num">2</div>
+          <div class="mod-title">Burocrazia &amp; Budget</div>
+          <div class="mod-persona">L'infermiera + Lo studente</div>
+          <div class="mod-desc">Fotografare lettere complesse e farle spiegare in italiano semplice. Tracciare spese fotografando scontrini, creare budget senza Excel. L'AI come "assistente legale tascabile".</div>
+        </div>
+
+        <div class="mod-card">
+          <div class="mod-badge badge-core">1° Intake</div>
+          <div class="mod-num">3</div>
+          <div class="mod-title">Sostenibilità in cucina</div>
+          <div class="mod-persona">L'eco-chef casalingo</div>
+          <div class="mod-desc">Mostrare gli avanzi del frigo all'AI per ricette zero-waste. Sostituzioni intelligenti per piatti più sani. Pianificazione della spesa settimanale per ridurre spreco economico e ambientale.</div>
+        </div>
+
+        <div class="mod-card">
+          <div class="mod-badge badge-core">1° Intake</div>
+          <div class="mod-num">4</div>
+          <div class="mod-title">Creatività &amp; Comunità</div>
+          <div class="mod-persona">La volontaria + L'imprenditrice</div>
+          <div class="mod-desc">Automatizzare la gestione di eventi benefici, scrivere bandi di fundraising. Generare immagini per locandine e testi emozionali per iniziative locali. L'AI per il terzo settore.</div>
+        </div>
+
+        <div class="mod-card">
+          <div class="mod-badge badge-core">1° Intake</div>
+          <div class="mod-num">5</div>
+          <div class="mod-title">Difesa personale digitale</div>
+          <div class="mod-persona">Il cittadino informato</div>
+          <div class="mod-desc">Riconoscere deepfake, video e voci generate dall'AI. Fact-checking assistito, difesa dal phishing e truffe digitali. La diffidenza come strumento di competenza critica.</div>
+        </div>
+
+        <div class="mod-card" style="border-style:dashed;background:var(--g50)">
+          <div class="mod-badge badge-extra">Co-creati</div>
+          <div class="mod-num" style="background:rgba(163,182,68,.1);color:var(--olive-dark)">+3</div>
+          <div class="mod-title">Moduli 6, 7, 8 — Da definire</div>
+          <div class="mod-persona">Co-creati con il 1° intake</div>
+          <div class="mod-desc">I partecipanti del 1° intake scelgono i 3 argomenti che vogliono approfondire. EIIS li sviluppa tra agosto e settembre 2026 e li integra nel Digital Campus permanente.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 4. STRATEGIA DI COMUNICAZIONE -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">4</div>
+        <h2 class="section-title">Strategia di Comunicazione</h2>
+      </div>
+
+      <div class="callout">
+        <div class="callout-head">Tono di voce</div>
+        <p>Non tecnologico, non accademico. <strong>Umano, caldo, inclusivo.</strong> Il programma parla alle persone, non ai tecnici. Il linguaggio è quello del vicinato, della famiglia, della comunità. L'AI diventa un amico, non un esperto irraggiungibile.</p>
+      </div>
+
+      <h3 style="font-size:16px;font-weight:800;color:var(--g900);margin:28px 0 16px">Messaggi chiave per fase</h3>
+
+      <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:32px">
+        <div style="background:var(--white);border:1px solid var(--g200);border-radius:12px;padding:18px 20px;border-left:4px solid var(--red)">
+          <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--red);margin-bottom:6px">Fase Ingaggio (Maggio)</div>
+          <div style="font-size:15px;font-weight:700;color:var(--g900);margin-bottom:4px">"L'AI non è per esperti. È per te."</div>
+          <div style="font-size:13px;color:var(--g500)">Abbassare le aspettative tecniche. Mettere al centro la persona, non la tecnologia.</div>
+        </div>
+        <div style="background:var(--white);border:1px solid var(--g200);border-radius:12px;padding:18px 20px;border-left:4px solid var(--red)">
+          <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--red);margin-bottom:6px">Lancio Corso (Giugno)</div>
+          <div style="font-size:15px;font-weight:700;color:var(--g900);margin-bottom:4px">"Impara mentre lo fai. Gratis. Quando vuoi."</div>
+          <div style="font-size:13px;color:var(--g500)">Evidenziare la gratuità (benefit esclusivo soci), la flessibilità 24/7 e l'approccio pratico.</div>
+        </div>
+        <div style="background:var(--white);border:1px solid var(--g200);border-radius:12px;padding:18px 20px;border-left:4px solid var(--olive)">
+          <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--olive-dark);margin-bottom:6px">Durante il Corso</div>
+          <div style="font-size:15px;font-weight:700;color:var(--g900);margin-bottom:4px">"Ogni settimana una nuova super-abilità."</div>
+          <div style="font-size:13px;color:var(--g500)">Weekly reminder con teaser del modulo successivo. Testimonial brevi dai partecipanti.</div>
+        </div>
+        <div style="background:var(--white);border:1px solid var(--g200);border-radius:12px;padding:18px 20px;border-left:4px solid var(--olive)">
+          <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--olive-dark);margin-bottom:6px">Post 1° Intake</div>
+          <div style="font-size:15px;font-weight:700;color:var(--g900);margin-bottom:4px">"Hai cambiato il programma. Davvero."</div>
+          <div style="font-size:13px;color:var(--g500)">Valorizzare la co-creazione. I partecipanti hanno scelto i prossimi moduli → senso di appartenenza e ownership.</div>
+        </div>
+      </div>
+
+      <h3 style="font-size:16px;font-weight:800;color:var(--g900);margin-bottom:16px">Piano canali &amp; formati</h3>
+
+      <table class="ch-table">
+        <thead>
+          <tr>
+            <th>Canale</th>
+            <th>Tipo</th>
+            <th>Formati principali</th>
+            <th>Frequenza</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="ch-name">Instagram</span></td>
+            <td><span class="ch-tag tag-social">Social</span></td>
+            <td>Post feed 1:1, Stories, Reels 15–30s, Carousel moduli</td>
+            <td>3–4×/settimana</td>
+          </tr>
+          <tr>
+            <td><span class="ch-name">Facebook</span></td>
+            <td><span class="ch-tag tag-social">Social</span></td>
+            <td>Post feed, Video nativo, Stories, Evento online</td>
+            <td>3–4×/settimana</td>
+          </tr>
+          <tr>
+            <td><span class="ch-name">LinkedIn</span></td>
+            <td><span class="ch-tag tag-social">Social</span></td>
+            <td>Articoli thought leadership, Post visivi, PDF carousel</td>
+            <td>2×/settimana</td>
+          </tr>
+          <tr>
+            <td><span class="ch-name">TikTok / Reels</span></td>
+            <td><span class="ch-tag tag-social">Social</span></td>
+            <td>Video brevi "AI in 60 secondi", Tutorial rapidi, POV personas</td>
+            <td>2–3×/settimana</td>
+          </tr>
+          <tr>
+            <td><span class="ch-name">Email / Newsletter</span></td>
+            <td><span class="ch-tag tag-email">Email</span></td>
+            <td>Announcement, Weekly module reminder, Feedback survey</td>
+            <td>1×/settimana</td>
+          </tr>
+          <tr>
+            <td><span class="ch-name">Punti vendita Coop</span></td>
+            <td><span class="ch-tag tag-onsite">On-site</span></td>
+            <td>Totem A1, Roll-up, Brochure A4, QR code per iscrizione</td>
+            <td>Lancio + reminder</td>
+          </tr>
+          <tr>
+            <td><span class="ch-name">Digital Campus EIIS</span></td>
+            <td><span class="ch-tag tag-digital">Platform</span></td>
+            <td>Notifiche in-app, Badge completamento, Quiz settimanali</td>
+            <td>Continuo</td>
+          </tr>
+          <tr>
+            <td><span class="ch-name">YouTube</span></td>
+            <td><span class="ch-tag tag-social">Social</span></td>
+            <td>Trailer programma, Intro moduli, Testimonianze</td>
+            <td>Mensile</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. FORMATI SOCIAL -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">5</div>
+        <h2 class="section-title">Creatività Social — Formati per Piattaforma</h2>
+      </div>
+
+      <div class="social-grid" style="grid-template-columns:repeat(2,1fr)">
+
+        <div class="soc-card">
+          <div class="soc-platform" style="color:#E1306C">Instagram</div>
+          <div class="soc-formats">
+            <div class="soc-fmt">Post quadrato 1080×1080 — Annuncio lancio</div>
+            <div class="soc-fmt">Carousel 1080×1080 — Presentazione 5 moduli</div>
+            <div class="soc-fmt">Stories 1080×1920 — Countdown apertura</div>
+            <div class="soc-fmt">Reels cover 1080×1920 — Teaser personas</div>
+          </div>
+          <div class="soc-timing">Palette: Rosso Coop + nero/bianco. Font bold. Nessun testo lungo.</div>
+        </div>
+
+        <div class="soc-card">
+          <div class="soc-platform" style="color:#1877F2">Facebook</div>
+          <div class="soc-formats">
+            <div class="soc-fmt">Post feed 1200×630 — Annuncio + link landing</div>
+            <div class="soc-fmt">Cover evento 1920×1080 — Apertura corso</div>
+            <div class="soc-fmt">Stories 1080×1920 — Module weekly</div>
+            <div class="soc-fmt">Video thumbnail 1280×720 — Trailer</div>
+          </div>
+          <div class="soc-timing">Target: fascia 40+. CTA chiara. Testo breve + link diretto.</div>
+        </div>
+
+        <div class="soc-card">
+          <div class="soc-platform" style="color:#0A66C2">LinkedIn</div>
+          <div class="soc-formats">
+            <div class="soc-fmt">Post landscape 1200×628 — Partnership announcement</div>
+            <div class="soc-fmt">Documento PDF carousel — Programma moduli</div>
+            <div class="soc-fmt">Banner profilo 1584×396 — Coop × EIIS</div>
+          </div>
+          <div class="soc-timing">Tone professionale. Focus impatto sociale. Citazioni dal programma.</div>
+        </div>
+
+        <div class="soc-card">
+          <div class="soc-platform" style="color:#FF0050">TikTok / Reels</div>
+          <div class="soc-formats">
+            <div class="soc-fmt">Video verticale 1080×1920 — "AI in 60 sec"</div>
+            <div class="soc-fmt">Thumbnail cover 1080×1920 — Per ogni modulo</div>
+            <div class="soc-fmt">Hook: problema → soluzione AI → CTA iscriviti</div>
+          </div>
+          <div class="soc-timing">Stile autentico, non patinato. Protagonisti reali. Musica trending.</div>
+        </div>
+
+        <div class="soc-card">
+          <div class="soc-platform" style="color:#FF0000">YouTube</div>
+          <div class="soc-formats">
+            <div class="soc-fmt">Thumbnail 1280×720 — Trailer programma</div>
+            <div class="soc-fmt">Banner canale 2560×1440 — Branding evento</div>
+            <div class="soc-fmt">End card con CTA iscrizione corso</div>
+          </div>
+          <div class="soc-timing">Video 90–120s per il trailer. Sottotitoli in italiano.</div>
+        </div>
+
+        <div class="soc-card">
+          <div class="soc-platform" style="color:#25D366">WhatsApp / Canali</div>
+          <div class="soc-formats">
+            <div class="soc-fmt">Status card 1080×1920 — Modulo della settimana</div>
+            <div class="soc-fmt">Immagine condivisibile 1080×1080 — "Ho completato il modulo X"</div>
+            <div class="soc-fmt">Sticker AI per chat</div>
+          </div>
+          <div class="soc-timing">Canale Coop ufficiale. Reminder settimanale + link accesso diretto.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 6. KPI -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">6</div>
+        <h2 class="section-title">KPI &amp; Metriche di Successo</h2>
+      </div>
+
+      <div class="kpi-grid" style="margin-bottom:32px">
+        <div class="kpi-card">
+          <div class="kpi-num">10.000</div>
+          <div class="kpi-unit">partecipanti</div>
+          <div class="kpi-label">Target massimo iscritti al Digital Campus entro 2 anni</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-num">8</div>
+          <div class="kpi-unit">moduli totali</div>
+          <div class="kpi-label">5 core + 3 co-creati con i partecipanti del 1° intake</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-num">6</div>
+          <div class="kpi-unit">settimane</div>
+          <div class="kpi-label">Durata del percorso base (1 modulo/settimana)</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-num">&gt;70%</div>
+          <div class="kpi-unit">completion rate</div>
+          <div class="kpi-label">Obiettivo tasso di completamento del 1° intake</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-num">NPS</div>
+          <div class="kpi-unit">≥ 50</div>
+          <div class="kpi-label">Net Promoter Score atteso dai partecipanti</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-num">2</div>
+          <div class="kpi-unit">anni</div>
+          <div class="kpi-label">Durata massima della piattaforma permanente</div>
+        </div>
+      </div>
+
+      <table class="ch-table">
+        <thead>
+          <tr>
+            <th>Metrica</th>
+            <th>Fase</th>
+            <th>Obiettivo</th>
+            <th>Come misurarla</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Pre-iscrizioni landing page</td>
+            <td>Maggio</td>
+            <td>Massimizzare lista attesa</td>
+            <td>Analytics form + email list</td>
+          </tr>
+          <tr>
+            <td>Reach campagna social</td>
+            <td>Maggio–Giugno</td>
+            <td>Impression sui canali Coop</td>
+            <td>Meta Business Suite, LinkedIn Analytics</td>
+          </tr>
+          <tr>
+            <td>Iscritti 1° intake</td>
+            <td>15 Giugno</td>
+            <td>Target definito da Coop</td>
+            <td>Digital Campus EIIS — dashboard</td>
+          </tr>
+          <tr>
+            <td>Tasso completamento moduli</td>
+            <td>Giugno–Luglio</td>
+            <td>&gt;70% completa tutti i moduli</td>
+            <td>LMS tracking EIIS</td>
+          </tr>
+          <tr>
+            <td>Partecipazione al feedback</td>
+            <td>Luglio</td>
+            <td>&gt;50% risponde alla survey</td>
+            <td>Survey tool (Typeform / Google)</td>
+          </tr>
+          <tr>
+            <td>Totale partecipanti cumulati</td>
+            <td>Ongoing</td>
+            <td>≤ 10.000 entro 2 anni</td>
+            <td>Dashboard EIIS + report mensile a Coop</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 7. BRAND IDENTITY -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">7</div>
+        <h2 class="section-title">Brand Identity &amp; Asset</h2>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
+
+        <div style="background:var(--white);border:1px solid var(--g200);border-radius:16px;padding:24px">
+          <div style="font-size:13px;font-weight:800;color:var(--g900);margin-bottom:16px">Palette Colori</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="width:40px;height:40px;border-radius:10px;background:#E2001A;flex-shrink:0"></div>
+              <div><div style="font-size:13px;font-weight:700">Rosso Coop</div><div style="font-size:11px;color:var(--g500)">#E2001A — Primario, CTA, titoli chiave</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="width:40px;height:40px;border-radius:10px;background:#A3B644;flex-shrink:0"></div>
+              <div><div style="font-size:13px;font-weight:700">Verde Innovazione</div><div style="font-size:11px;color:var(--g500)">#A3B644 — Accento, sostenibilità, positivo</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="width:40px;height:40px;border-radius:10px;background:#111110;flex-shrink:0"></div>
+              <div><div style="font-size:13px;font-weight:700">Nero Profondo</div><div style="font-size:11px;color:var(--g500)">#111110 — Sfondi hero, testo principale</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="width:40px;height:40px;border-radius:10px;background:#FFFFFF;border:1px solid #E5E5E3;flex-shrink:0"></div>
+              <div><div style="font-size:13px;font-weight:700">Bianco</div><div style="font-size:11px;color:var(--g500)">#FFFFFF — Sfondi light, testo su scuro</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:var(--white);border:1px solid var(--g200);border-radius:16px;padding:24px">
+          <div style="font-size:13px;font-weight:800;color:var(--g900);margin-bottom:16px">Tipografia &amp; Logo</div>
+          <div style="font-size:13px;color:var(--g600);line-height:1.7;margin-bottom:12px">
+            <strong>Font:</strong> Inter (Google Fonts) — weight 400/600/700/800/900<br>
+            <strong>Logo primario:</strong> Coop (rosso su bianco / bianco su scuro)<br>
+            <strong>Co-brand:</strong> Coop × EIIS (sempre in coppia)<br>
+            <strong>Programma:</strong> "AI per la vita quotidiana" — tagline ufficiale
+          </div>
+          <div style="background:var(--g900);border-radius:10px;padding:16px;text-align:center">
+            <div style="font-size:28px;font-weight:900;color:#E2001A;letter-spacing:-1px;margin-bottom:4px">coop</div>
+            <div style="font-size:11px;color:var(--g500)">× EIIS</div>
+            <div style="font-size:13px;font-weight:700;color:var(--white);margin-top:8px">AI per la vita quotidiana</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="background:var(--white);border:1px solid var(--g200);border-radius:16px;padding:24px">
+        <div style="font-size:13px;font-weight:800;color:var(--g900);margin-bottom:16px">Asset disponibili</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+          <div style="background:var(--g50);border-radius:10px;padding:14px;font-size:12px;color:var(--g700)">
+            <div style="font-weight:700;margin-bottom:4px">Coop_Italia_logo.svg.png</div>
+            <div style="color:var(--g500)">Logo ufficiale Coop su bianco (PNG)</div>
+          </div>
+          <div style="background:var(--g50);border-radius:10px;padding:14px;font-size:12px;color:var(--g700)">
+            <div style="font-weight:700;margin-bottom:4px">Logo EIIS — Versione negativa.png</div>
+            <div style="color:var(--g500)">Logo EIIS versione bianca su scuro</div>
+          </div>
+          <div style="background:var(--g50);border-radius:10px;padding:14px;font-size:12px;color:var(--g700)">
+            <div style="font-weight:700;margin-bottom:4px">aiperlavitaquotidiana.png</div>
+            <div style="color:var(--g500)">Logo programma / marca del corso</div>
+          </div>
+          <div style="background:var(--g50);border-radius:10px;padding:14px;font-size:12px;color:var(--g700)">
+            <div style="font-weight:700;margin-bottom:4px">Covers orizzontali ×5</div>
+            <div style="color:var(--g500)">cover_h_01–05.jpg · Uso web/social landscape</div>
+          </div>
+          <div style="background:var(--g50);border-radius:10px;padding:14px;font-size:12px;color:var(--g700)">
+            <div style="font-weight:700;margin-bottom:4px">Covers verticali ×5</div>
+            <div style="color:var(--g500)">cover_v_01–05.jpg · Uso Stories/Reels/poster</div>
+          </div>
+          <div style="background:var(--g50);border-radius:10px;padding:14px;font-size:12px;color:var(--g700)">
+            <div style="font-weight:700;margin-bottom:4px">Design System HTML</div>
+            <div style="color:var(--g500)">design-system.html · Componenti UI completi</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div><!-- /main-col -->
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <!-- Quick facts -->
+    <div class="side-card">
+      <div class="side-title">Quick Facts</div>
+      <div class="side-row"><span class="side-row-label">Proposta</span><span class="side-row-val">P-39/2025</span></div>
+      <div class="side-row"><span class="side-row-label">Partner</span><span class="side-row-val">EIIS + Coop</span></div>
+      <div class="side-row"><span class="side-row-label">Formato</span><span class="side-row-val">100% online</span></div>
+      <div class="side-row"><span class="side-row-label">Requisiti</span><span class="side-row-val green">Nessuno</span></div>
+      <div class="side-row"><span class="side-row-label">Target</span><span class="side-row-val">Non esperti AI</span></div>
+      <div class="side-row"><span class="side-row-label">Moduli totali</span><span class="side-row-val">5 + 3</span></div>
+      <div class="side-row"><span class="side-row-label">Max iscritti</span><span class="side-row-val red">10.000</span></div>
+      <div class="side-row"><span class="side-row-label">Piattaforma</span><span class="side-row-val">Digital Campus EIIS</span></div>
+      <div class="side-row"><span class="side-row-label">Durata</span><span class="side-row-val">Max 2 anni</span></div>
+    </div>
+
+    <!-- Fasi -->
+    <div class="side-card">
+      <div class="side-title">Fasi del Progetto</div>
+      <div class="phase-list">
+        <div class="phase-chip">
+          <div class="phase-dot" style="background:var(--red)"></div>
+          <div>
+            <div class="phase-name">Promozione</div>
+            <div class="phase-dates">Inizio maggio 2026</div>
+          </div>
+        </div>
+        <div class="phase-chip">
+          <div class="phase-dot" style="background:var(--red)"></div>
+          <div>
+            <div class="phase-name">Landing Page live</div>
+            <div class="phase-dates">15 maggio 2026</div>
+          </div>
+        </div>
+        <div class="phase-chip">
+          <div class="phase-dot" style="background:#F59E0B"></div>
+          <div>
+            <div class="phase-name">1° Intake — 4 moduli</div>
+            <div class="phase-dates">15 giu → 6 lug 2026</div>
+          </div>
+        </div>
+        <div class="phase-chip">
+          <div class="phase-dot" style="background:#A3B644"></div>
+          <div>
+            <div class="phase-name">Feedback + Co-creazione</div>
+            <div class="phase-dates">Metà lug → metà ago</div>
+          </div>
+        </div>
+        <div class="phase-chip">
+          <div class="phase-dot" style="background:#A3B644"></div>
+          <div>
+            <div class="phase-name">Sviluppo +3 moduli</div>
+            <div class="phase-dates">Fine ago → fine set</div>
+          </div>
+        </div>
+        <div class="phase-chip">
+          <div class="phase-dot" style="background:#3B82F6"></div>
+          <div>
+            <div class="phase-name">2° Intake</div>
+            <div class="phase-dates">5 ottobre 2026</div>
+          </div>
+        </div>
+        <div class="phase-chip">
+          <div class="phase-dot" style="background:var(--g300)"></div>
+          <div>
+            <div class="phase-name">Intake successivi</div>
+            <div class="phase-dates">Da fine ott 2026 (2 anni)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Deliverables EIIS -->
+    <div class="side-card">
+      <div class="side-title">Deliverables EIIS</div>
+      <div class="deliverables">
+        <div class="del-item">
+          <div class="del-icon">📱</div>
+          <div>
+            <div class="del-text">Materiali comunicazione social + canali online</div>
+            <div class="del-date">Entro inizio maggio 2026</div>
+          </div>
+        </div>
+        <div class="del-item">
+          <div class="del-icon">🖨️</div>
+          <div>
+            <div class="del-text">Materiali fisici punti vendita Coop</div>
+            <div class="del-date">Entro inizio maggio 2026</div>
+          </div>
+        </div>
+        <div class="del-item">
+          <div class="del-icon">🌐</div>
+          <div>
+            <div class="del-text">Mini landing page con form iscrizione</div>
+            <div class="del-date">Entro 15 maggio 2026</div>
+          </div>
+        </div>
+        <div class="del-item">
+          <div class="del-icon">🎓</div>
+          <div>
+            <div class="del-text">Digital Campus + Moduli 1–4 rilasciati</div>
+            <div class="del-date">15 giu → 6 lug 2026</div>
+          </div>
+        </div>
+        <div class="del-item">
+          <div class="del-icon">📊</div>
+          <div>
+            <div class="del-text">Survey feedback + analisi richieste</div>
+            <div class="del-date">Lug–ago 2026</div>
+          </div>
+        </div>
+        <div class="del-item">
+          <div class="del-icon">➕</div>
+          <div>
+            <div class="del-text">3 moduli aggiuntivi co-creati</div>
+            <div class="del-date">Fine ago – fine set 2026</div>
+          </div>
+        </div>
+        <div class="del-item">
+          <div class="del-icon">♾️</div>
+          <div>
+            <div class="del-text">Piattaforma permanente + assistenza light</div>
+            <div class="del-date">Da ott 2026 (max 2 anni)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Links -->
+    <div class="side-card">
+      <div class="side-title">Risorse del progetto</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <a href="landing-page.html" style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--g50);border:1px solid var(--g100);border-radius:10px;text-decoration:none;font-size:13px;font-weight:600;color:var(--g800);transition:all .2s">
+          <span>🌐</span> Landing Page
+        </a>
+        <a href="social-kit.html" style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--g50);border:1px solid var(--g100);border-radius:10px;text-decoration:none;font-size:13px;font-weight:600;color:var(--g800);transition:all .2s">
+          <span>📸</span> Social Media Kit
+        </a>
+      </div>
+    </div>
+
+  </div><!-- /sidebar -->
+
+</div><!-- /page-body -->
+
+<!-- FOOTER -->
+<div class="page-footer">
+  <strong>AI per la vita quotidiana</strong> — <span>Coop Italia × EIIS</span> — Piano di Lancio 2026 · Proposta P-39/2025
+</div>
+
+</body>
+</html>

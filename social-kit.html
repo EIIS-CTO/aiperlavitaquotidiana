@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Social Media Kit — AI per la vita quotidiana</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --red:#E2001A;--olive:#A3B644;--olive-dk:#7D8E2F;
+  --white:#fff;--g50:#F7F7F6;--g100:#EFEFEE;--g200:#D9D9D7;--g300:#B8B8B5;
+  --g400:#8E8E8B;--g500:#6B6B68;--g600:#4A4A48;--g700:#333332;--g800:#1E1E1D;--g900:#111110;
+  --font:'Inter',system-ui,sans-serif;
+}
+body{font-family:var(--font);background:var(--g50);color:var(--g800);-webkit-font-smoothing:antialiased}
+
+/* NAV */
+.nav{
+  position:sticky;top:0;z-index:200;height:60px;
+  background:rgba(17,17,16,.96);backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(255,255,255,.05);
+  display:flex;align-items:center;padding:0 32px;
+}
+.nav-inner{max-width:1280px;width:100%;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.nav-brand{font-weight:800;font-size:16px;color:var(--white);text-decoration:none}
+.nav-brand span{color:var(--olive)}
+.nav-links{display:flex;gap:6px}
+.nav-links a{padding:7px 16px;border-radius:9999px;font-size:13px;font-weight:600;text-decoration:none;color:var(--g400);transition:.2s}
+.nav-links a:hover{color:var(--white);background:rgba(255,255,255,.06)}
+.nav-links a.active{color:var(--white);background:var(--red)}
+
+/* HERO */
+.ph{background:var(--g900);padding:56px 32px 48px;position:relative;overflow:hidden}
+.ph::before{content:'';position:absolute;inset:0;background-image:url('imgs/social_cover_h.png');background-size:cover;background-position:center;opacity:.25}
+.ph-inner{max-width:1120px;margin:0 auto;position:relative;z-index:1;text-align:center}
+.ph-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:9999px;background:rgba(226,0,26,.15);border:1px solid rgba(226,0,26,.2);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#FF6B7A;margin-bottom:20px}
+.ph h1{font-size:40px;font-weight:900;color:var(--white);margin-bottom:10px}
+.ph h1 span{color:var(--red)}
+.ph p{font-size:16px;color:var(--g400);max-width:560px;margin:0 auto}
+
+/* BODY */
+.body{max-width:1120px;margin:0 auto;padding:56px 32px 80px}
+
+/* SECTION */
+.s-head{margin-bottom:28px}
+.s-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--red);margin-bottom:8px}
+.s-title{font-size:26px;font-weight:900;color:var(--g900)}
+
+/* PLATFORM TABS */
+.ptabs{display:flex;gap:8px;margin-bottom:36px;flex-wrap:wrap}
+.ptab{
+  padding:9px 20px;border-radius:9999px;font-size:13px;font-weight:700;
+  border:1.5px solid var(--g200);color:var(--g500);cursor:pointer;transition:.2s;background:var(--white);
+}
+.ptab.on{background:var(--g900);color:var(--white);border-color:var(--g900)}
+.ptab:hover:not(.on){border-color:var(--g700);color:var(--g700)}
+
+/* CARDS GRID */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:48px}
+.card{background:var(--white);border:1px solid var(--g200);border-radius:20px;overflow:hidden;transition:.25s}
+.card:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.08)}
+.card-preview{position:relative;background:var(--g900);overflow:hidden}
+.card-preview img{width:100%;display:block;object-fit:cover}
+
+/* ── MOCKUP OVERLAYS ── */
+/* We overlay the module images as if they're in a social post frame */
+.mockup-post{
+  position:relative;background:var(--g900);
+  display:flex;flex-direction:column;
+}
+.mockup-post .bg{width:100%;aspect-ratio:1/1;object-fit:cover;display:block}
+.mockup-overlay{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:16px;
+  background:linear-gradient(0deg,rgba(17,17,16,.85) 30%,transparent 80%);
+}
+.mockup-overlay-top{
+  position:absolute;top:12px;left:12px;right:12px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.mo-logo{height:18px;filter:brightness(0) invert(1);object-fit:contain}
+.mo-badge{
+  padding:4px 10px;border-radius:9999px;
+  background:var(--red);color:var(--white);
+  font-size:10px;font-weight:700;
+}
+.mo-tag{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.6);margin-bottom:4px}
+.mo-title{font-size:15px;font-weight:800;color:var(--white);line-height:1.2;margin-bottom:6px}
+.mo-cta{
+  display:inline-block;padding:5px 12px;border-radius:9999px;
+  background:var(--red);color:var(--white);
+  font-size:10px;font-weight:700;
+}
+
+/* Stories vertical mockup */
+.mockup-story{
+  position:relative;background:var(--g900);
+  aspect-ratio:9/16;overflow:hidden;
+  display:flex;flex-direction:column;
+}
+.mockup-story .bg{
+  position:absolute;inset:0;
+  background-image:url('imgs/social_story_v.png');
+  background-size:cover;background-position:center;
+}
+.story-content{position:relative;z-index:1;padding:24px;flex:1;display:flex;flex-direction:column;}
+.story-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:auto}
+.story-logo{height:16px;filter:brightness(0) invert(1);object-fit:contain}
+.story-counter{font-size:10px;font-weight:700;color:rgba(255,255,255,.5)}
+.story-mid{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;flex-direction:column;gap:12px}
+.story-icon{font-size:48px}
+.story-headline{font-size:22px;font-weight:900;color:var(--white);line-height:1.15;max-width:220px;margin:0 auto}
+.story-headline em{color:var(--red);font-style:normal}
+.story-bottom{text-align:center}
+.story-cta{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:12px 28px;border-radius:9999px;
+  background:var(--red);color:var(--white);
+  font-size:13px;font-weight:800;
+}
+
+/* Landscape social */
+.mockup-land{
+  position:relative;background:var(--g900);
+  aspect-ratio:16/9;overflow:hidden;
+}
+.mockup-land .bg{
+  position:absolute;inset:0;
+  background-image:url('imgs/social_cover_h.png');
+  background-size:cover;background-position:center;
+  opacity:.7;
+}
+.land-content{
+  position:relative;z-index:1;height:100%;
+  display:flex;flex-direction:column;justify-content:space-between;
+  padding:24px 32px;
+}
+.land-top{display:flex;align-items:center;gap:12px}
+.land-logo{height:20px;filter:brightness(0) invert(1);object-fit:contain}
+.land-div{width:1px;height:16px;background:rgba(255,255,255,.2)}
+.land-partner{font-size:11px;font-weight:700;color:rgba(255,255,255,.6)}
+.land-bottom{}
+.land-tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.5);margin-bottom:8px}
+.land-title{font-size:clamp(18px,2.5vw,26px);font-weight:900;color:var(--white);line-height:1.15;margin-bottom:12px}
+.land-title em{color:var(--red);font-style:normal}
+.land-date{font-size:12px;font-weight:600;color:rgba(255,255,255,.5)}
+
+/* Card body */
+.card-body{padding:18px 20px}
+.card-plat{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px}
+.card-name{font-size:15px;font-weight:800;color:var(--g900);margin-bottom:4px}
+.card-spec{font-size:12px;color:var(--g500)}
+
+/* COPY TEMPLATES */
+.copy-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:48px}
+.copy-card{background:var(--white);border:1px solid var(--g200);border-radius:16px;padding:22px}
+.copy-plat{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.copy-plat-dot{width:10px;height:10px;border-radius:50%}
+.copy-plat-name{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--g600)}
+.copy-phase{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--red);margin-bottom:8px}
+.copy-text{
+  font-size:14px;color:var(--g700);line-height:1.7;
+  background:var(--g50);border-radius:10px;padding:14px;
+  border-left:3px solid var(--g200);
+  white-space:pre-line;
+}
+.copy-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.copy-tag{padding:3px 10px;border-radius:9999px;font-size:11px;font-weight:600;background:var(--g100);color:var(--g500)}
+
+/* COLOUR SPECS */
+.colours{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.col-swatch{border-radius:14px;overflow:hidden;border:1px solid var(--g200)}
+.col-fill{height:100px}
+.col-info{padding:12px;background:var(--white)}
+.col-name{font-size:13px;font-weight:700;color:var(--g900)}
+.col-hex{font-size:11px;color:var(--g400);font-family:monospace;margin-top:2px}
+.col-use{font-size:11px;color:var(--g500);margin-top:4px}
+
+/* SPACING */
+.mt-48{margin-top:48px}
+.mb-24{margin-bottom:24px}
+
+.divider{height:1px;background:var(--g200);margin:48px 0}
+
+@media(max-width:900px){
+  .cards{grid-template-columns:1fr 1fr}
+  .copy-grid{grid-template-columns:1fr}
+  .colours{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:600px){
+  .cards{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-brand">AI<span>vita</span></a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="piano-di-lancio.html">Piano di Lancio</a>
+      <a href="landing-page.html">Landing Page</a>
+      <a href="social-kit.html" class="active">Social Kit</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="ph">
+  <div class="ph-inner">
+    <div class="ph-badge">Social Media Kit 2026</div>
+    <h1>Creatività <span>Social</span></h1>
+    <p>Tutti i formati, copy e template per il lancio del programma — pronti per Instagram, Facebook, LinkedIn e TikTok.</p>
+  </div>
+</div>
+
+<div class="body">
+
+  <!-- ① POST FEED MODULI -->
+  <div class="s-head mt-48">
+    <div class="s-label">Formato 01 · Feed Post 1:1</div>
+    <div class="s-title">Post Instagram &amp; Facebook — Presentazione Moduli</div>
+  </div>
+
+  <div class="cards">
+    <!-- MOD 1 -->
+    <div class="card">
+      <div class="card-preview mockup-post" style="aspect-ratio:1/1">
+        <img class="bg" src="imgs/mod1_cassetta.png" alt="Modulo 1">
+        <div class="mockup-overlay">
+          <div class="mockup-overlay-top">
+            <img class="mo-logo" src="imgs/logo_coop.png" alt="Coop">
+            <div class="mo-badge">MODULO 1</div>
+          </div>
+          <div class="mo-tag">Settimana 1 · Intro</div>
+          <div class="mo-title">La cassetta<br>degli attrezzi</div>
+          <div class="mo-cta">Scopri →</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-plat" style="color:#E1306C">Instagram / Facebook</div>
+        <div class="card-name">Post Feed — Modulo 1</div>
+        <div class="card-spec">1080×1080 · Feed post · Lancio 10 giugno</div>
+      </div>
+    </div>
+
+    <!-- MOD 2 -->
+    <div class="card">
+      <div class="card-preview mockup-post" style="aspect-ratio:1/1">
+        <img class="bg" src="imgs/mod2_burocrazia.png" alt="Modulo 2">
+        <div class="mockup-overlay">
+          <div class="mockup-overlay-top">
+            <img class="mo-logo" src="imgs/logo_coop.png" alt="Coop">
+            <div class="mo-badge">MODULO 2</div>
+          </div>
+          <div class="mo-tag">Settimana 2 · Budget</div>
+          <div class="mo-title">Semplifica<br>la burocrazia</div>
+          <div class="mo-cta">Scopri →</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-plat" style="color:#E1306C">Instagram / Facebook</div>
+        <div class="card-name">Post Feed — Modulo 2</div>
+        <div class="card-spec">1080×1080 · Feed post · Lancio 22 giugno</div>
+      </div>
+    </div>
+
+    <!-- MOD 3 -->
+    <div class="card">
+      <div class="card-preview mockup-post" style="aspect-ratio:1/1">
+        <img class="bg" src="imgs/mod3_cucina.png" alt="Modulo 3">
+        <div class="mockup-overlay">
+          <div class="mockup-overlay-top">
+            <img class="mo-logo" src="imgs/logo_coop.png" alt="Coop">
+            <div class="mo-badge">MODULO 3</div>
+          </div>
+          <div class="mo-tag">Settimana 3 · Cucina</div>
+          <div class="mo-title">Sostenibilità<br>in cucina</div>
+          <div class="mo-cta">Scopri →</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-plat" style="color:#E1306C">Instagram / Facebook</div>
+        <div class="card-name">Post Feed — Modulo 3</div>
+        <div class="card-spec">1080×1080 · Feed post · Lancio 29 giugno</div>
+      </div>
+    </div>
+
+    <!-- MOD 4 -->
+    <div class="card">
+      <div class="card-preview mockup-post" style="aspect-ratio:1/1">
+        <img class="bg" src="imgs/mod4_comunita.png" alt="Modulo 4">
+        <div class="mockup-overlay">
+          <div class="mockup-overlay-top">
+            <img class="mo-logo" src="imgs/logo_coop.png" alt="Coop">
+            <div class="mo-badge">MODULO 4</div>
+          </div>
+          <div class="mo-tag">Settimana 4 · Comunità</div>
+          <div class="mo-title">Creatività<br>e comunità</div>
+          <div class="mo-cta">Scopri →</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-plat" style="color:#E1306C">Instagram / Facebook</div>
+        <div class="card-name">Post Feed — Modulo 4</div>
+        <div class="card-spec">1080×1080 · Feed post · Lancio 6 luglio</div>
+      </div>
+    </div>
+
+    <!-- MOD 5 -->
+    <div class="card">
+      <div class="card-preview mockup-post" style="aspect-ratio:1/1">
+        <img class="bg" src="imgs/mod5_difesa.png" alt="Modulo 5">
+        <div class="mockup-overlay">
+          <div class="mockup-overlay-top">
+            <img class="mo-logo" src="imgs/logo_coop.png" alt="Coop">
+            <div class="mo-badge">MODULO 5</div>
+          </div>
+          <div class="mo-tag">Settimana 5 · Sicurezza</div>
+          <div class="mo-title">Difesa personale<br>digitale</div>
+          <div class="mo-cta">Scopri →</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-plat" style="color:#E1306C">Instagram / Facebook</div>
+        <div class="card-name">Post Feed — Modulo 5</div>
+        <div class="card-spec">1080×1080 · Feed post · Lancio luglio</div>
+      </div>
+    </div>
+
+    <!-- LANCIO GENERALE -->
+    <div class="card">
+      <div class="card-preview mockup-post" style="aspect-ratio:1/1">
+        <img class="bg" src="imgs/hero_landing.png" alt="Lancio">
+        <div class="mockup-overlay">
+          <div class="mockup-overlay-top">
+            <img class="mo-logo" src="imgs/logo_coop.png" alt="Coop">
+            <div class="mo-badge" style="background:var(--olive)">GRATIS</div>
+          </div>
+          <div class="mo-tag">Esclusivo Soci Coop</div>
+          <div class="mo-title">L'AI che<br>semplifica la vita</div>
+          <div class="mo-cta">Iscriviti ora →</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-plat" style="color:#E1306C">Instagram / Facebook</div>
+        <div class="card-name">Post Lancio — Hero</div>
+        <div class="card-spec">1080×1080 · Annuncio programma · Maggio 2026</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ② STORIES / REELS -->
+  <div class="s-head">
+    <div class="s-label">Formato 02 · Stories &amp; Reels</div>
+    <div class="s-title">Stories Instagram — Template verticali 9:16</div>
+  </div>
+
+  <div class="cards" style="grid-template-columns:repeat(4,1fr)">
+    <!-- Story 1: Lancio -->
+    <div class="card">
+      <div class="mockup-story">
+        <div class="mockup-story .bg"></div>
+        <div class="story-content">
+          <div class="story-top">
+            <img class="story-logo" src="imgs/logo_coop.png" alt="Coop" style="height:14px">
+            <div class="story-counter">1 / 5</div>
+          </div>
+          <div class="story-mid">
+            <div class="story-icon">🤖</div>
+            <div class="story-headline">L'AI non è per esperti.<br>È per <em>te.</em></div>
+          </div>
+          <div class="story-bottom">
+            <div class="story-cta">Scopri il corso →</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-plat" style="color:#E1306C">Instagram Stories</div>
+        <div class="card-name">Lancio · Hero Claim</div>
+        <div class="card-spec">1080×1920 · Maggio 2026</div>
+      </div>
+    </div>
+
+    <!-- Story 2: Modulo 1 -->
+    <div class="card">
+      <div class="mockup-story">
+        <div class="story-content" style="background:linear-gradient(160deg,#111110 0%,#1a0005 100%)">
+          <div class="story-top">
+            <img class="story-logo" src="imgs/logo_coop.png" alt="Coop" style="height:14px">
+            <div class="story-counter">MOD 1</div>
+          </div>
+          <div class="story-mid">
+            <img src="imgs/mod1_cassetta.png" style="width:100%;height:200px;object-fit:cover;border-radius:14px">
+            <div class="story-headline" style="font-size:18px">La cassetta<br>degli <em>attrezzi</em></div>
+          </div>
+          <div class="story-bottom">
+            <div class="story-cta">Inizia ora →</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-plat" style="color:#E1306C">Instagram Stories</div>
+        <div class="card-name">Weekly — Modulo 1</div>
+        <div class="card-spec">1080×1920 · 15 giugno</div>
+      </div>
+    </div>
+
+    <!-- Story 3: Community -->
+    <div class="card">
+      <div class="mockup-story">
+        <div class="story-content" style="background:linear-gradient(160deg,#111110 0%,#0d1800 100%)">
+          <div class="story-top">
+            <img class="story-logo" src="imgs/logo_coop.png" alt="Coop" style="height:14px">
+            <div class="story-counter">GRATIS</div>
+          </div>
+          <div class="story-mid">
+            <img src="imgs/community_scene.png" style="width:100%;height:200px;object-fit:cover;border-radius:14px">
+            <div class="story-headline" style="font-size:18px">Per tutti<br>i <em>soci Coop</em></div>
+            <div style="font-size:12px;color:rgba(255,255,255,.55);text-align:center">Nessun requisito · 100% online</div>
+          </div>
+          <div class="story-bottom">
+            <div class="story-cta" style="background:var(--olive)">Iscriviti gratis →</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-plat" style="color:#E1306C">Instagram Stories</div>
+        <div class="card-name">Community · Inclusivo</div>
+        <div class="card-spec">1080×1920 · Campagna promo</div>
+      </div>
+    </div>
+
+    <!-- Story 4: Countdown -->
+    <div class="card">
+      <div class="mockup-story">
+        <div class="story-content" style="background:linear-gradient(160deg,#E2001A 0%,#6B0010 60%,#111110 100%)">
+          <div class="story-top">
+            <img class="story-logo" src="imgs/logo_coop.png" alt="Coop" style="height:14px">
+            <div class="story-counter" style="color:rgba(255,255,255,.6)">COUNTDOWN</div>
+          </div>
+          <div class="story-mid">
+            <div class="story-icon">📅</div>
+            <div style="font-size:64px;font-weight:900;color:var(--white);line-height:1">15</div>
+            <div style="font-size:14px;font-weight:600;color:rgba(255,255,255,.7)">giugno 2026</div>
+            <div class="story-headline" style="font-size:18px">Si <em>apre</em> il corso</div>
+          </div>
+          <div class="story-bottom">
+            <div class="story-cta">Pre-iscriviti →</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-plat" style="color:#E1306C">Instagram Stories</div>
+        <div class="card-name">Countdown Apertura</div>
+        <div class="card-spec">1080×1920 · Prima del 15 giu</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ③ LANDSCAPE — FB / LI / YT -->
+  <div class="s-head">
+    <div class="s-label">Formato 03 · Landscape 16:9</div>
+    <div class="s-title">Facebook, LinkedIn &amp; YouTube — Banner &amp; Cover</div>
+  </div>
+
+  <div class="cards" style="grid-template-columns:1fr 1fr">
+    <div class="card">
+      <div class="mockup-land">
+        <div class="mockup-land .bg"></div>
+        <div class="land-content">
+          <div class="land-top">
+            <img class="land-logo" src="imgs/logo_coop.png" alt="Coop">
+            <div class="land-div"></div>
+            <span class="land-partner">× EIIS</span>
+          </div>
+          <div class="land-bottom">
+            <div class="land-tag">Esclusivo per Soci Coop</div>
+            <div class="land-title">AI per la <em>vita</em> quotidiana</div>
+            <div class="land-date">Apertura 15 Giugno 2026 · Gratis · 100% Online</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-plat" style="color:#1877F2">Facebook / LinkedIn</div>
+        <div class="card-name">Annuncio Lancio — Landscape</div>
+        <div class="card-spec">1200×630 · Post link + cover evento</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="aspect-ratio:16/9;overflow:hidden;position:relative;background:var(--g900)">
+        <img src="imgs/community_scene.png" style="width:100%;height:100%;object-fit:cover;opacity:.5">
+        <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(17,17,16,.9) 0%,rgba(17,17,16,.3) 100%);display:flex;flex-direction:column;justify-content:space-between;padding:24px 32px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <img src="imgs/logo_coop.png" style="height:18px;filter:brightness(0) invert(1)" alt="Coop">
+          </div>
+          <div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.4);margin-bottom:8px">Coop Italia × EIIS</div>
+            <div style="font-size:clamp(16px,2.2vw,22px);font-weight:900;color:var(--white);line-height:1.2;margin-bottom:10px">Per chi non sa niente<br>di AI — ed è perfetto così.</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.5)">Corso gratuito · Giugno 2026</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-plat" style="color:#0A66C2">LinkedIn</div>
+        <div class="card-name">LinkedIn Post — Community</div>
+        <div class="card-spec">1200×628 · Post orgánico</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ④ COPY TEMPLATES -->
+  <div class="s-head">
+    <div class="s-label">Copy Templates</div>
+    <div class="s-title">Testi pronti per ogni fase del lancio</div>
+  </div>
+
+  <div class="copy-grid">
+
+    <div class="copy-card">
+      <div class="copy-plat">
+        <div class="copy-plat-dot" style="background:#E1306C"></div>
+        <div class="copy-plat-name">Instagram &amp; Facebook</div>
+      </div>
+      <div class="copy-phase">Fase 1 · Annuncio Lancio (Maggio)</div>
+      <div class="copy-text">🤖 L'intelligenza artificiale non è "roba per esperti".
+È per te.
+
+Coop lancia il primo corso gratuito di AI per i propri soci.
+Pratico. Inclusivo. Al tuo ritmo.
+
+5 moduli su: burocrazia, cucina, comunità, sicurezza e molto altro.
+
+📅 Dal 15 giugno — posti limitati a 10.000
+🔗 Iscriviti ora (link in bio)</div>
+      <div class="copy-tags">
+        <span class="copy-tag">#AIperTutti</span>
+        <span class="copy-tag">#Coop</span>
+        <span class="copy-tag">#IntelligenzaArtificiale</span>
+        <span class="copy-tag">#FormazioneCoop</span>
+      </div>
+    </div>
+
+    <div class="copy-card">
+      <div class="copy-plat">
+        <div class="copy-plat-dot" style="background:#0A66C2"></div>
+        <div class="copy-plat-name">LinkedIn</div>
+      </div>
+      <div class="copy-phase">Fase 1 · Partnership Announcement</div>
+      <div class="copy-text">Coop Italia e EIIS annunciano "AI per la vita quotidiana" — il programma formativo che porta l'intelligenza artificiale nella quotidianità dei soci Coop.
+
+Non un corso tecnico. Un percorso umano.
+
+L'obiettivo è abbattere le 3 barriere che allontanano le persone dall'AI: la complessità percepita, la distanza emotiva e il timore per la privacy.
+
+5 moduli pratici. Fino a 10.000 partecipanti. 100% gratuito.
+
+→ Apertura iscrizioni: 15 giugno 2026</div>
+      <div class="copy-tags">
+        <span class="copy-tag">#Innovation</span>
+        <span class="copy-tag">#AIForAll</span>
+        <span class="copy-tag">#Coop</span>
+        <span class="copy-tag">#DigitalInclusion</span>
+      </div>
+    </div>
+
+    <div class="copy-card">
+      <div class="copy-plat">
+        <div class="copy-plat-dot" style="background:#FF0050"></div>
+        <div class="copy-plat-name">TikTok / Reels</div>
+      </div>
+      <div class="copy-phase">Fase 2 · Weekly Module Hook</div>
+      <div class="copy-text">POV: hai una lettera del condominio che non capisci 📄
+
+→ La fotografi
+→ La mostri all'AI
+→ In 10 secondi te la spiega in italiano semplice ✅
+
+Questo è il Modulo 2 di AI per la vita quotidiana.
+Gratis. Per tutti i soci Coop. Inizia ora ↓</div>
+      <div class="copy-tags">
+        <span class="copy-tag">#AIIntelligenzaArtificiale</span>
+        <span class="copy-tag">#ImparareConL'AI</span>
+        <span class="copy-tag">#Coop</span>
+      </div>
+    </div>
+
+    <div class="copy-card">
+      <div class="copy-plat">
+        <div class="copy-plat-dot" style="background:#25D366"></div>
+        <div class="copy-plat-name">WhatsApp Channel / Email</div>
+      </div>
+      <div class="copy-phase">Fase 2 · Weekly Module Reminder</div>
+      <div class="copy-text">📚 Questa settimana su AI per la vita quotidiana:
+
+MODULO 3 — Sostenibilità in cucina
+
+Guarda gli avanzi del frigo in modo nuovo: mostrali all'AI e ricevi ricette zero-waste su misura. Meno spreco, più creatività.
+
+▶ Accedi al modulo → [link]
+
+Hai già completato il Modulo 2? Ottimo lavoro! 🎉</div>
+      <div class="copy-tags">
+        <span class="copy-tag">Newsletter</span>
+        <span class="copy-tag">WhatsApp</span>
+        <span class="copy-tag">Push notification</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ⑤ COLOURS & SPECS -->
+  <div class="s-head">
+    <div class="s-label">Brand Specs</div>
+    <div class="s-title">Palette &amp; Specifiche tecniche</div>
+  </div>
+
+  <div class="colours">
+    <div class="col-swatch">
+      <div class="col-fill" style="background:#E2001A"></div>
+      <div class="col-info">
+        <div class="col-name">Rosso Coop</div>
+        <div class="col-hex">#E2001A</div>
+        <div class="col-use">CTA · Badge · Accenti</div>
+      </div>
+    </div>
+    <div class="col-swatch">
+      <div class="col-fill" style="background:#111110"></div>
+      <div class="col-info">
+        <div class="col-name">Nero Profondo</div>
+        <div class="col-hex">#111110</div>
+        <div class="col-use">Sfondi · Testo hero</div>
+      </div>
+    </div>
+    <div class="col-swatch">
+      <div class="col-fill" style="background:#A3B644"></div>
+      <div class="col-info">
+        <div class="col-name">Verde Innovazione</div>
+        <div class="col-hex">#A3B644</div>
+        <div class="col-use">Sostenibilità · Positivo</div>
+      </div>
+    </div>
+    <div class="col-swatch">
+      <div class="col-fill" style="background:#FFFFFF;border:none"></div>
+      <div class="col-info" style="border-top:1px solid var(--g200)">
+        <div class="col-name">Bianco</div>
+        <div class="col-hex">#FFFFFF</div>
+        <div class="col-use">Testo su scuro · Sfondi</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:var(--white);border:1px solid var(--g200);border-radius:16px;padding:24px;margin-top:0">
+    <div style="font-size:13px;font-weight:800;color:var(--g900);margin-bottom:16px">Specifiche formati</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+      <div style="background:var(--g50);border-radius:10px;padding:14px;font-size:12px">
+        <div style="font-weight:800;color:var(--g900);margin-bottom:4px">Feed Post</div>
+        <div style="color:var(--g500)">1080×1080 px · 1:1<br>Max 2200 caratteri<br>3–5 hashtag</div>
+      </div>
+      <div style="background:var(--g50);border-radius:10px;padding:14px;font-size:12px">
+        <div style="font-weight:800;color:var(--g900);margin-bottom:4px">Stories / Reels Cover</div>
+        <div style="color:var(--g500)">1080×1920 px · 9:16<br>Safe zone: 250px T/B<br>Video: 15–30 sec</div>
+      </div>
+      <div style="background:var(--g50);border-radius:10px;padding:14px;font-size:12px">
+        <div style="font-weight:800;color:var(--g900);margin-bottom:4px">Landscape Banner</div>
+        <div style="color:var(--g500)">1200×630 px · 1.91:1<br>FB/LinkedIn post<br>YT thumb: 1280×720</div>
+      </div>
+      <div style="background:var(--g50);border-radius:10px;padding:14px;font-size:12px">
+        <div style="font-weight:800;color:var(--g900);margin-bottom:4px">Font</div>
+        <div style="color:var(--g500)">Inter (Google Fonts)<br>Weight: 700–900 sui titoli<br>Min 28px sui post</div>
+      </div>
+      <div style="background:var(--g50);border-radius:10px;padding:14px;font-size:12px">
+        <div style="font-weight:800;color:var(--g900);margin-bottom:4px">Logo Coop</div>
+        <div style="color:var(--g500)">Rosso su bianco<br>Bianco su scuro<br>Min 80px larghezza</div>
+      </div>
+      <div style="background:var(--g50);border-radius:10px;padding:14px;font-size:12px">
+        <div style="font-weight:800;color:var(--g900);margin-bottom:4px">Co-branding</div>
+        <div style="color:var(--g500)">Coop sempre in primo piano<br>EIIS in supporto<br>Non invertire la gerarchia</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /body -->
+
+<div style="background:var(--g900);padding:28px 32px;text-align:center;font-size:12px;color:var(--g500);border-top:1px solid rgba(255,255,255,.04)">
+  <strong style="color:var(--white)">AI per la vita quotidiana</strong> — <span style="color:var(--olive)">Coop Italia × EIIS</span> — Social Media Kit 2026
+</div>
+
+</body>
+</html>
