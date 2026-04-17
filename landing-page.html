@@ -302,20 +302,114 @@ footer{
 .faq-q::after{content:'＋';font-size:20px;font-weight:300;color:var(--red);flex-shrink:0}
 .faq-a{font-size:14px;color:var(--g500);line-height:1.7;margin-top:12px;max-width:680px}
 
+/* ── MOBILE (≤900px: tablet) ── */
 @media(max-width:900px){
-  .hero{padding:100px 24px 60px}
-  .why-grid,.who-grid{grid-template-columns:1fr}
-  .mod-grid{grid-template-columns:1fr}
+  .nav{padding:0 20px;height:60px}
+  .nav-logos img{height:24px}
+  .nav-logos{gap:10px}
+  .nav-links{gap:14px}
+  .nav-links a:not(.nav-cta){display:none}
+  .nav-cta{padding:8px 16px;font-size:13px}
+
+  .sec{padding:64px 24px}
+  .cta-sec{padding:72px 24px}
+
+  .hero{padding:96px 24px 56px;min-height:auto}
+  .hero-kicker{font-size:11px;padding:6px 14px;margin-bottom:20px}
+  .hero h1{font-size:clamp(34px,8vw,52px);margin-bottom:18px;line-height:1.06}
+  .hero-sub{font-size:15px;margin-bottom:32px;line-height:1.6}
+  .hero-actions{gap:12px;margin-bottom:40px}
+  .btn{padding:14px 24px;font-size:14px}
+  .hero-stats{gap:24px}
+  .stat-n{font-size:22px}
+  .stat-l{font-size:11px}
+
+  .trust-bar{padding:16px 24px}
+  .trust-inner{gap:20px}
+  .trust-item{font-size:12px}
+
+  .sec-title{font-size:clamp(24px,6vw,36px);line-height:1.15}
+  .sec-sub{font-size:15px}
+
+  .why-grid,.who-grid{grid-template-columns:1fr;gap:14px;margin-top:36px}
+  .why-card{padding:24px}
+  .why-icon{font-size:30px;margin-bottom:14px}
+  .why-card h3{font-size:17px}
+
+  .mod-grid{grid-template-columns:1fr;margin-top:36px}
   .mod-card{grid-template-columns:1fr}
-  .mod-img{height:220px}
+  .mod-img{height:200px}
   .mod-card:nth-child(odd){border-right:none}
   .mod-card:nth-last-child(-n+2){border-bottom:1px solid var(--g100)}
-  .how-grid{grid-template-columns:1fr}
-  .community{grid-template-columns:1fr}
-  .community-img{height:300px}
-  .community-content{padding:48px 32px}
-  .tl-wrap{grid-template-columns:1fr 1fr}
-  .footer-top{grid-template-columns:1fr 1fr}
+  .mod-extra{flex-direction:column;align-items:flex-start;gap:16px;padding:28px 24px}
+  .mod-extra-badge{margin-left:0}
+
+  .how-grid{grid-template-columns:1fr;gap:36px;margin-top:36px}
+  .how-step{gap:14px;padding:16px 0}
+  .how-step-num{width:34px;height:34px;font-size:14px}
+
+  .community{grid-template-columns:1fr;min-height:auto}
+  .community-img{height:260px;order:-1}
+  .community-content{padding:48px 24px}
+  .community-pills{gap:8px;margin-top:20px}
+  .cpill{font-size:12px;padding:7px 14px}
+
+  .tl-wrap{grid-template-columns:1fr 1fr;gap:32px 16px;margin-top:36px}
+  .tl-wrap::before{display:none}
+  .tl-dot{margin-bottom:10px}
+  .tl-event{font-size:11px}
+
+  .who-img{height:200px}
+  .who-body{padding:20px}
+
+  .cta-inner h2{font-size:clamp(26px,6vw,40px)}
+  .cta-inner p{font-size:15px;margin-bottom:28px}
+
+  .footer-top{grid-template-columns:1fr 1fr;gap:32px;margin-bottom:32px}
+  footer{padding:40px 24px 24px}
+  .footer-brand{grid-column:1/-1}
+
+  .faq-list{margin-top:32px}
+  .faq-q{font-size:15px;gap:12px}
+  .faq-a{font-size:13.5px}
+}
+
+/* ── PHONE (≤560px: compact) ── */
+@media(max-width:560px){
+  .sec{padding:56px 20px}
+  .cta-sec{padding:64px 20px}
+  .hero{padding:88px 20px 48px}
+  .hero h1{font-size:38px;letter-spacing:-.02em}
+  .hero-sub{font-size:14.5px;margin-bottom:28px}
+  .hero-actions{width:100%}
+  .hero-actions .btn{width:100%;justify-content:center}
+  .hero-stats{gap:20px;width:100%}
+  .stat{flex:1;min-width:45%}
+
+  .nav{padding:0 16px;height:56px}
+  .nav-logos img{height:22px}
+  .nav-cta{padding:7px 14px;font-size:12px}
+
+  .sec-label{font-size:11px}
+  .sec-title{font-size:26px}
+
+  .why-card{padding:22px}
+  .mod-body{padding:22px 20px}
+  .mod-img{height:180px}
+  .community-content{padding:40px 20px}
+  .who-card{border-radius:16px}
+  .who-img{height:180px}
+
+  .footer-top{grid-template-columns:1fr;gap:28px}
+  .footer-brand{grid-column:auto}
+  .footer-bottom{flex-direction:column;align-items:flex-start;gap:16px}
+
+  .tl-wrap{grid-template-columns:1fr;gap:20px}
+  .tl-node{flex-direction:row;align-items:center;gap:14px;text-align:left}
+  .tl-node .tl-dot{margin-bottom:0;flex-shrink:0}
+  .tl-month,.tl-event{text-align:left}
+
+  .btn-ghost{width:100%;justify-content:center}
 }
 </style>
 </head>
@@ -595,7 +689,7 @@ footer{
       <div class="who-card">
         <div class="who-img"><img src="imgs/mod2_burocrazia.png" alt="Lo studente universitario"></div>
         <div class="who-body">
-          <div class="who-name">L'infermiera pragmatica</div>
+          <div class="who-name">Lo studente pragmatico</div>
           <div class="who-role">Burocrazia</div>
           <div class="who-quote">"Fotografo la lettera del condominio e in 10 secondi l'AI me la spiega in italiano semplice. Non chiamo più l'avvocato per ogni cosa."</div>
         </div>
