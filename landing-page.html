@@ -48,9 +48,9 @@ body{font-family:var(--font);color:var(--g800);background:var(--white);-webkit-f
 }
 .hero-bg{
   position:absolute;inset:0;
-  background-image:url('imgs/hero_landing.png');
-  background-size:cover;background-position:center 30%;
-  opacity:.35;
+  background-image:url('imgs/hero_cover_v2.png');
+  background-size:cover;background-position:center 50%;
+  opacity:.45;
 }
 .hero-grad{
   position:absolute;inset:0;
@@ -302,6 +302,36 @@ footer{
 .faq-q::after{content:'＋';font-size:20px;font-weight:300;color:var(--red);flex-shrink:0}
 .faq-a{font-size:14px;color:var(--g500);line-height:1.7;margin-top:12px;max-width:680px}
 
+/* ── INTRO ── */
+.intro{background:var(--white);padding:96px 40px}
+.intro-inner{max-width:920px;margin:0 auto;text-align:center}
+.intro-eyebrow{
+  display:inline-block;font-size:12px;font-weight:800;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--red);
+  padding:8px 18px;border-radius:9999px;
+  background:rgba(226,0,26,.08);border:1px solid rgba(226,0,26,.18);
+  margin-bottom:20px;
+}
+.intro h2{
+  font-size:clamp(28px,3.6vw,46px);font-weight:900;
+  color:var(--g900);line-height:1.1;letter-spacing:-.02em;
+  margin-bottom:36px;
+}
+.intro h2 em{font-style:normal;color:var(--red)}
+.intro-body{
+  display:flex;flex-direction:column;gap:24px;
+  text-align:left;max-width:780px;margin:0 auto;
+}
+.intro-body p{
+  font-size:18px;line-height:1.75;color:var(--g700);
+}
+.intro-body p strong{color:var(--g900);font-weight:700}
+.intro-rule{
+  width:64px;height:4px;border-radius:2px;
+  background:linear-gradient(90deg,var(--red),var(--olive));
+  margin:0 auto 28px;
+}
+
 /* ── MOBILE (≤900px: tablet) ── */
 @media(max-width:900px){
   .nav{padding:0 20px;height:60px}
@@ -313,6 +343,10 @@ footer{
 
   .sec{padding:64px 24px}
   .cta-sec{padding:72px 24px}
+  .intro{padding:64px 24px}
+  .intro h2{font-size:clamp(24px,6.5vw,38px);margin-bottom:28px}
+  .intro-body p{font-size:16px;line-height:1.7}
+  .intro-body{gap:18px}
 
   .hero{padding:96px 24px 56px;min-height:auto}
   .hero-kicker{font-size:11px;padding:6px 14px;margin-bottom:20px}
@@ -378,6 +412,9 @@ footer{
 @media(max-width:560px){
   .sec{padding:56px 20px}
   .cta-sec{padding:64px 20px}
+  .intro{padding:56px 20px}
+  .intro h2{font-size:26px}
+  .intro-body p{font-size:15.5px}
   .hero{padding:88px 20px 48px}
   .hero h1{font-size:38px;letter-spacing:-.02em}
   .hero-sub{font-size:14.5px;margin-bottom:28px}
@@ -467,6 +504,19 @@ footer{
     <div class="trust-item"><span class="trust-icon">✓</span> Contenuti aggiornati al 2026</div>
   </div>
 </div>
+
+<!-- INTRO: perché Coop ha deciso di fare questo corso -->
+<section class="intro">
+  <div class="intro-inner">
+    <div class="intro-rule"></div>
+    <span class="intro-eyebrow">Da Coop, per i soci</span>
+    <h2>Una rivoluzione<br>che riguarda <em>tutti noi</em>.</h2>
+    <div class="intro-body">
+      <p>L'intelligenza artificiale sta trasformando velocemente la nostra vita di ogni giorno, ma anche i rapporti tra le persone e la società, generando una vera e propria rivoluzione. Coop intende rimanere al passo con i tempi e investire nella formazione dei suoi soci, che non devono restare esclusi da questo cambiamento, anzi: possono imparare a usare l'AI, a sfruttarne le potenzialità in modo consapevole nelle proprie incombenze quotidiane per risparmiare stress, tempo e denaro e per saper interagire con gli altri in questa nuova era.</p>
+      <p>Per questo motivo nasce <strong>"AI per la vita quotidiana"</strong>, un corso online semplice, utile e divertente realizzato da Coop insieme a EIIS, l'European Institute of Innovation for Sustainability, ente di alta formazione sui temi della sostenibilità e delle nuove tecnologie. Uno strumento gratuito per rendere più accessibile e democratica la rivoluzione digitale in corso.</p>
+    </div>
+  </div>
+</section>
 
 <!-- WHY -->
 <section class="sec why" id="programma">
