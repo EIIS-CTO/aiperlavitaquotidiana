@@ -99,6 +99,17 @@ body{font-family:var(--font);color:var(--g800);background:var(--white);-webkit-f
 .stat{display:flex;flex-direction:column;gap:2px}
 .stat-n{font-size:28px;font-weight:900;color:var(--white);line-height:1}
 .stat-l{font-size:12px;font-weight:500;color:var(--g400);margin-top:4px}
+.hero-trust{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:36px}
+.trust-dot{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 14px;border-radius:9999px;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+  font-size:12.5px;font-weight:600;color:var(--g300);
+}
+.trust-dot::before{
+  content:'';width:5px;height:5px;border-radius:50%;
+  background:var(--olive,#A8B560);display:inline-block;
+}
 
 /* ── TRUST BAR ── */
 .trust-bar{
@@ -316,30 +327,26 @@ footer{
 /* ── HERO DESKTOP overlay (≥901px): text on bottom-left of cover ── */
 @media(min-width:901px){
   .hero{min-height:680px}
-  /* Cover overlay: dark gradient on left + bottom for readability */
+  /* Cover overlay: stronger left wash + soft right falloff for balance */
   .hero-cover::after{
     inset:0;height:auto;
     background:
       linear-gradient(to right,
-        rgba(17,17,16,.92) 0%,
-        rgba(17,17,16,.78) 18%,
-        rgba(17,17,16,.45) 38%,
-        rgba(17,17,16,.10) 58%,
-        rgba(17,17,16,0) 75%),
-      linear-gradient(to bottom,
-        rgba(17,17,16,0) 35%,
-        rgba(17,17,16,.55) 80%,
-        rgba(17,17,16,.92) 100%);
+        rgba(17,17,16,.96) 0%,
+        rgba(17,17,16,.88) 30%,
+        rgba(17,17,16,.55) 50%,
+        rgba(17,17,16,.15) 70%,
+        rgba(17,17,16,0) 85%);
   }
-  /* Stage floats over the cover, anchored bottom-left */
+  /* Stage floats over the cover, vertically centered for balance */
   .hero-stage{
     position:absolute;inset:0;
     background:transparent;padding:0;
-    display:flex;align-items:flex-end;
+    display:flex;align-items:center;
   }
   .hero-stage .hero-inner{
     max-width:1200px;width:100%;margin:0 auto;
-    padding:0 40px 64px;
+    padding:0 40px;
   }
   /* Slightly tighter title on overlay to fit nicely */
   .hero-stage .hero h1,.hero-stage h1{
@@ -534,9 +541,9 @@ footer{
   <!-- Dark stage with title / CTA / stats -->
   <div class="hero-stage">
     <div class="hero-inner">
-      <div class="hero-kicker"><span></span>Esclusivo per Soci Coop · Gratuito · 100% Online</div>
-      <h1><em>AI</em> per la vita quotidiana.</h1>
-      <p class="hero-sub">Un percorso pratico per imparare a usare l'AI nella vita di tutti i giorni, senza essere esperti. Bastano curiosità, un computer o uno smartphone.</p>
+      <div class="hero-kicker"><span></span>Gratuito per Soci Coop</div>
+      <h1><em>AI</em> per la vita<br>quotidiana</h1>
+      <p class="hero-sub">Un percorso pratico per usare l'AI ogni giorno. Senza essere esperti: bastano curiosità e uno smartphone.</p>
       <div class="hero-actions">
         <a href="#iscrizione" class="btn btn-red">
           <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5l7 7-7 7"/><path d="M5 12h14"/></svg>
@@ -544,11 +551,15 @@ footer{
         </a>
         <a href="#moduli" class="btn btn-ghost">Scopri i moduli</a>
       </div>
+      <div class="hero-trust">
+        <span class="trust-dot">100% online</span>
+        <span class="trust-dot">Accesso 24/7</span>
+        <span class="trust-dot">Nessun requisito tecnico</span>
+      </div>
       <div class="hero-stats">
-        <div class="stat"><span class="stat-n">4+3</span><span class="stat-l">Moduli · 7 in totale</span></div>
+        <div class="stat"><span class="stat-n">7</span><span class="stat-l">Moduli formativi</span></div>
         <div class="stat"><span class="stat-n">10.000</span><span class="stat-l">Posti disponibili</span></div>
-        <div class="stat"><span class="stat-n">0</span><span class="stat-l">Requisiti tecnici</span></div>
-        <div class="stat"><span class="stat-n">24/7</span><span class="stat-l">Accesso libero</span></div>
+        <div class="stat"><span class="stat-n">8</span><span class="stat-l">Mesi di percorso</span></div>
       </div>
     </div>
   </div>
