@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Identikit Personaggi — AI per la vita quotidiana</title>
+<style>
+  :root {
+    --coop-red: #E30613;
+    --coop-green: #A2C617;
+    --bg: #FAF8F3;
+    --card: #FFFFFF;
+    --ink: #1A1A1A;
+    --ink-soft: #555;
+    --line: #E5E2DA;
+    --shadow: 0 2px 12px rgba(0,0,0,0.05);
+    --shadow-hover: 0 8px 24px rgba(0,0,0,0.1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    font-size: 16px;
+  }
+
+  /* Header */
+  header {
+    background: linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%);
+    color: white;
+    padding: 60px 24px 80px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--coop-red), var(--coop-green));
+  }
+  header h1 {
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+  }
+  header h1 .accent { color: var(--coop-green); }
+  header .subtitle {
+    font-size: clamp(14px, 2vw, 18px);
+    opacity: 0.85;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+  header .meta {
+    margin-top: 24px;
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    font-size: 13px;
+    opacity: 0.7;
+  }
+  header .meta span {
+    padding: 4px 12px;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 999px;
+  }
+
+  /* Container */
+  .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+
+  /* Nav */
+  nav.toc {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 24px;
+    margin-top: -40px;
+    box-shadow: var(--shadow);
+    position: relative;
+    z-index: 10;
+    margin-bottom: 60px;
+  }
+  nav.toc h3 {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-soft);
+    margin-bottom: 14px;
+  }
+  nav.toc ul { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
+  nav.toc a {
+    display: inline-block;
+    padding: 8px 16px;
+    background: var(--bg);
+    color: var(--ink);
+    text-decoration: none;
+    border-radius: 999px;
+    font-size: 14px;
+    border: 1px solid var(--line);
+    transition: all 0.2s;
+  }
+  nav.toc a:hover { background: var(--ink); color: white; border-color: var(--ink); }
+  nav.toc a.expert { border-color: var(--coop-green); }
+  nav.toc a.expert:hover { background: var(--coop-green); border-color: var(--coop-green); }
+
+  /* Section labels */
+  .section-label {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink-soft);
+    margin: 60px 0 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--line);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-label .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--coop-green);
+  }
+  .section-label.experts .dot { background: var(--coop-red); }
+
+  /* Card */
+  .character-card {
+    background: var(--card);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 32px;
+    box-shadow: var(--shadow);
+    transition: box-shadow 0.3s;
+    scroll-margin-top: 20px;
+  }
+  .character-card:hover { box-shadow: var(--shadow-hover); }
+  .card-inner {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 0;
+  }
+  @media (max-width: 768px) {
+    .card-inner { grid-template-columns: 1fr; }
+  }
+
+  /* Image */
+  .portrait {
+    position: relative;
+    background: linear-gradient(135deg, #F0EDE5 0%, #E5E2DA 100%);
+    min-height: 400px;
+    overflow: hidden;
+  }
+  .portrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    position: absolute;
+    inset: 0;
+  }
+  .portrait .placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: var(--ink-soft);
+    font-size: 14px;
+    text-align: center;
+    padding: 20px;
+  }
+  .portrait .placeholder svg {
+    width: 60px; height: 60px;
+    opacity: 0.3;
+    margin-bottom: 12px;
+  }
+  .badge-role {
+    position: absolute;
+    top: 16px; left: 16px;
+    background: rgba(0,0,0,0.75);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    backdrop-filter: blur(8px);
+    z-index: 2;
+  }
+  .badge-role.expert { background: var(--coop-red); }
+  .badge-role.expert::before { content: '★ '; }
+
+  /* Content */
+  .content { padding: 32px; }
+  .content h2 {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    margin-bottom: 4px;
+  }
+  .content .nickname {
+    color: var(--ink-soft);
+    font-size: 16px;
+    font-style: italic;
+    margin-bottom: 4px;
+  }
+  .content .module-tag {
+    display: inline-block;
+    background: var(--coop-green);
+    color: var(--ink);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .module-tag.expert { background: var(--coop-red); color: white; }
+
+  /* Quick info row */
+  .quick-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 16px;
+    padding: 20px;
+    background: var(--bg);
+    border-radius: 12px;
+    margin-bottom: 24px;
+  }
+  .quick-info div {
+    font-size: 14px;
+  }
+  .quick-info .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+    margin-bottom: 2px;
+  }
+  .quick-info .value { font-weight: 600; }
+
+  /* Sections */
+  .section-block { margin-bottom: 20px; }
+  .section-block h3 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--coop-red);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-block h3::before {
+    content: '';
+    width: 24px;
+    height: 2px;
+    background: var(--coop-red);
+  }
+  .section-block.expert h3 { color: var(--coop-green); }
+  .section-block.expert h3::before { background: var(--coop-green); }
+  .section-block p { font-size: 15px; color: var(--ink); }
+  .section-block ul { margin-left: 20px; font-size: 14px; }
+  .section-block li { margin-bottom: 4px; }
+
+  /* Curiosities */
+  .curiosities {
+    background: linear-gradient(135deg, #FFF9E6 0%, #FFF3CC 100%);
+    border-left: 4px solid #F5C518;
+    padding: 16px 20px;
+    border-radius: 8px;
+    margin-top: 16px;
+  }
+  .curiosities h4 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #8B6914;
+    margin-bottom: 8px;
+  }
+  .curiosities ul { list-style: none; margin: 0; }
+  .curiosities li {
+    font-size: 14px;
+    padding-left: 24px;
+    position: relative;
+    margin-bottom: 6px;
+  }
+  .curiosities li::before {
+    content: '💡';
+    position: absolute;
+    left: 0;
+    font-size: 14px;
+  }
+
+  /* Quote */
+  .quote {
+    font-style: italic;
+    color: var(--ink-soft);
+    border-left: 3px solid var(--ink);
+    padding: 12px 18px;
+    margin: 16px 0;
+    background: var(--bg);
+    border-radius: 0 8px 8px 0;
+    font-size: 15px;
+  }
+  .quote::before { content: '"'; font-size: 24px; color: var(--coop-red); margin-right: 4px; }
+  .quote::after { content: '"'; font-size: 24px; color: var(--coop-red); margin-left: 4px; }
+
+  /* Footer */
+  footer {
+    background: var(--ink);
+    color: white;
+    padding: 40px 24px;
+    text-align: center;
+    margin-top: 80px;
+    font-size: 14px;
+    opacity: 0.9;
+  }
+  footer a { color: var(--coop-green); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Identikit <span class="accent">Personaggi</span></h1>
+  <p class="subtitle">AI per la vita quotidiana — Cast completo dei protagonisti e degli esperti del corso Coop</p>
+  <div class="meta">
+    <span>5 protagonisti</span>
+    <span>2 esperti ricorrenti</span>
+    <span>7 avatar AI realistici</span>
+    <span>5 moduli</span>
+  </div>
+</header>
+
+<div class="container">
+
+<nav class="toc">
+  <h3>Cast completo</h3>
+  <ul>
+    <li><a href="#francesco" class="expert">★ Francesco</a></li>
+    <li><a href="#marta" class="expert">★ Marta</a></li>
+    <li><a href="#maria">Maria · M1</a></li>
+    <li><a href="#luca">Luca · M2</a></li>
+    <li><a href="#paola">Paola · M3</a></li>
+    <li><a href="#giulia">Giulia · M4</a></li>
+    <li><a href="#roberto">Roberto · M5</a></li>
+  </ul>
+</nav>
+
+<!-- ESPERTI -->
+<div class="section-label experts"><span class="dot"></span>Esperti ricorrenti</div>
+
+<!-- FRANCESCO -->
+<article id="francesco" class="character-card">
+  <div class="card-inner">
+    <div class="portrait">
+      <span class="badge-role expert">Esperto Tech</span>
+      <img src="personaggi-reference/francesco.png" alt="Francesco Rinaldi" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div class="placeholder" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        Immagine in generazione
+      </div>
+    </div>
+    <div class="content">
+      <h2>Francesco Rinaldi</h2>
+      <p class="nickname">"Lo Smanettone" · 34 anni · Milano</p>
+      <span class="module-tag expert">Presente in tutti i moduli</span>
+
+      <div class="quick-info">
+        <div><div class="label">Professione</div><div class="value">Sviluppatore freelance</div></div>
+        <div><div class="label">Background</div><div class="value">Informatica + formatore</div></div>
+        <div><div class="label">Vibe</div><div class="value">Nerd accessibile</div></div>
+        <div><div class="label">Segno distintivo</div><div class="value">Occhiali tondi neri</div></div>
+      </div>
+
+      <div class="section-block expert">
+        <h3>Ruolo narrativo</h3>
+        <p>L'esperto tech accessibile. Non è il nerd distante — è quello che in famiglia tutti chiamano quando il Wi-Fi non va. Spiega la tecnologia con metafore da bar, senza mai far sentire stupido chi ascolta. È il ponte tra il mondo tech e le persone normali.</p>
+      </div>
+
+      <div class="section-block expert">
+        <h3>Carattere</h3>
+        <ul>
+          <li><strong>Entusiasta ma paziente</strong>: si illumina quando parla di tech, ma sa rallentare</li>
+          <li><strong>Autoironico</strong>: ride del proprio essere nerd prima che lo facciano gli altri</li>
+          <li><strong>Pratico</strong>: non spiega la teoria, mostra come si fa</li>
+        </ul>
+      </div>
+
+      <div class="section-block expert">
+        <h3>Aspetto fisico</h3>
+        <p>1.78m, corporatura media leggermente magra. Capelli castano scuro mossi medio-corti "appena alzato ma sta bene". Barba di 3-4 giorni curata. Occhi marroni scuri espressivi. Occhiali tondi sottili neri opachi. Sorriso asimmetrico a sinistra.</p>
+      </div>
+
+      <div class="section-block expert">
+        <h3>Guardaroba</h3>
+        <p>T-shirt tinta unita (blu, grigio, verde bosco) sotto felpa con zip, jeans scuri, sneakers bianche pulite, smartwatch al polso. Mai: giacca formale, cravatta.</p>
+      </div>
+
+      <div class="quote">ChatGPT è come un assistente molto colto ma un po' letterale — devi dirgli esattamente cosa vuoi.</div>
+
+      <div class="curiosities">
+        <h4>Curiosità & dettagli</h4>
+        <ul>
+          <li>Vive in un monolocale ai Navigli pieno di gadget tech</li>
+          <li>Ha scelto di insegnare invece di programmare perché ama spiegare</li>
+          <li>Quando parla, gesticola molto e usa similitudini di tutti i giorni</li>
+          <li>In coppia con Marta forma il duo "entusiasmo + prudenza"</li>
+          <li>Funzione: tutorial pratici, confronto tra tool, demistificazione, pillole tech</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</article>
+
+<!-- MARTA -->
+<article id="marta" class="character-card">
+  <div class="card-inner">
+    <div class="portrait">
+      <span class="badge-role expert">Esperta Etica & Privacy</span>
+      <img src="personaggi-reference/marta.png" alt="Marta Colombo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div class="placeholder" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        Immagine in generazione
+      </div>
+    </div>
+    <div class="content">
+      <h2>Marta Colombo</h2>
+      <p class="nickname">L'esperta di diritto digitale · 41 anni · Roma</p>
+      <span class="module-tag expert">Presente in tutti i moduli</span>
+
+      <div class="quick-info">
+        <div><div class="label">Professione</div><div class="value">Avvocata diritto digitale</div></div>
+        <div><div class="label">Background</div><div class="value">Ex Garante Privacy</div></div>
+        <div><div class="label">Vibe</div><div class="value">Autorevole ed empatica</div></div>
+        <div><div class="label">Segno distintivo</div><div class="value">Capelli ramati a coda bassa</div></div>
+      </div>
+
+      <div class="section-block expert">
+        <h3>Ruolo narrativo</h3>
+        <p>La voce della sicurezza e della consapevolezza. Marta non spaventa — rassicura. È quella che ti dice "sì, puoi usare l'AI, ma ecco le tre cose da sapere prima". Bilancia l'entusiasmo di Francesco con pragmatismo e attenzione ai diritti.</p>
+      </div>
+
+      <div class="section-block expert">
+        <h3>Carattere</h3>
+        <ul>
+          <li><strong>Autorevole senza essere rigida</strong>: sa il fatto suo ma non fa la professoressa</li>
+          <li><strong>Chiara e diretta</strong>: trasforma il legalese in italiano comprensibile</li>
+          <li><strong>Empatica</strong>: capisce che la gente ha paura, e parte da lì</li>
+        </ul>
+      </div>
+
+      <div class="section-block expert">
+        <h3>Aspetto fisico</h3>
+        <p>1.68m, corporatura media proporzionata. Capelli castano medio con riflessi ramati, lunghi alle spalle, spesso in coda bassa morbida. Occhi verdi-nocciola. Pelle chiara leggermente ambrata, lentiggini sul naso. <strong>NO occhiali</strong> (per differenziarla da Francesco).</p>
+      </div>
+
+      <div class="section-block expert">
+        <h3>Guardaroba</h3>
+        <p>Camicetta o blusa in toni naturali (bianco, crema, salvia, terracotta), blazer destrutturato, pantaloni a sigaretta o gonna midi, orecchini piccoli discreti. Mai: sportivo, tech-wear, colori fluo.</p>
+      </div>
+
+      <div class="quote">Se metti la foto di tuo figlio su ChatGPT, ecco cosa succede ai tuoi dati.</div>
+
+      <div class="curiosities">
+        <h4>Curiosità & dettagli</h4>
+        <ul>
+          <li>Ha lavorato al Garante per la Privacy prima di mettersi in proprio</li>
+          <li>Ha un appartamento luminoso e ordinatissimo nel quartiere Prati a Roma</li>
+          <li>Usa sempre esempi concreti, mai astratti</li>
+          <li>Spesso interviene dopo Francesco con "Sì, ma attenzione a..."</li>
+          <li>Funzione: privacy, etica pratica, rassicurazione, contrasto truffe, check legali</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</article>
+
+<!-- PROTAGONISTI -->
+<div class="section-label"><span class="dot"></span>Protagonisti dei moduli</div>
+
+<!-- MARIA -->
+<article id="maria" class="character-card">
+  <div class="card-inner">
+    <div class="portrait">
+      <span class="badge-role">Modulo 1</span>
+      <img src="personaggi-reference/maria.png" alt="Maria Ferretti" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div class="placeholder" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        Immagine in generazione
+      </div>
+    </div>
+    <div class="content">
+      <h2>Maria Ferretti</h2>
+      <p class="nickname">L'infermiera pragmatica · 52 anni · Bologna</p>
+      <span class="module-tag">M1 · Cassetta degli attrezzi · Burocrazia & Budget</span>
+
+      <div class="quick-info">
+        <div><div class="label">Professione</div><div class="value">Infermiera ospedaliera</div></div>
+        <div><div class="label">Famiglia</div><div class="value">Divorziata, 1 figlio</div></div>
+        <div><div class="label">Tech-level</div><div class="value">WhatsApp e basta</div></div>
+        <div><div class="label">Socia Coop</div><div class="value">Da 18 anni</div></div>
+      </div>
+
+      <div class="section-block">
+        <h3>Problema scatenante</h3>
+        <p>Riceve un'email dall'amministratore di condominio: <strong>contestazione legale</strong> per infiltrazione d'acqua (art. 2051 c.c., diffida formale, 15 giorni per rispondere). Non capisce il linguaggio legale. Tiene anche i conti su un quaderno e fatica a controllare le spese.</p>
+      </div>
+
+      <div class="section-block">
+        <h3>Soluzione AI</h3>
+        <p><strong>L'assistente legale tascabile</strong>: fotografare la lettera e farsela spiegare in italiano semplice. Scrivere risposte formali in pochi secondi. <strong>Life hack finanziario</strong>: fotografare gli scontrini per tracciare le spese senza Excel.</p>
+      </div>
+
+      <div class="section-block">
+        <h3>Carattere</h3>
+        <ul>
+          <li>Pragmatica, diretta, battute secche</li>
+          <li>Diffidente verso la tecnologia ("roba da film")</li>
+          <li>Autosufficiente, non chiede aiuto facilmente</li>
+          <li>Stanca ma resiliente — turni pesanti, burocrazia infinita</li>
+        </ul>
+      </div>
+
+      <div class="section-block">
+        <h3>Aspetto fisico</h3>
+        <p>1.65m, corporatura robusta da chi sta in piedi 8 ore. Capelli castano con grigi, medio-corti, raccolti con fermaglio. Occhi marroni caldi, sguardo diretto e stanco. Mani curate ma senza smalto. <strong>Occhiali da lettura appesi al collo con catenella</strong>.</p>
+      </div>
+
+      <div class="quote">E io che ne so di queste cose? Faccio l'infermiera, non l'avvocato.</div>
+
+      <div class="curiosities">
+        <h4>Curiosità & dettagli</h4>
+        <ul>
+          <li>Vive in un condominio anni '70 in periferia di Bologna</li>
+          <li>Il figlio studia all'università a Firenze</li>
+          <li>Fa la spesa alla Coop 2-3 volte a settimana, sempre stesso percorso</li>
+          <li>Cadenza emiliana leggera, tono colloquiale</li>
+          <li>Indossa giubbotti pratici (piumini sottili) e scarpe basse comode</li>
+          <li>Arco emotivo: routine → shock → scoperta → scetticismo → primo contatto AI → rivelazione</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</article>
+
+<!-- LUCA -->
+<article id="luca" class="character-card">
+  <div class="card-inner">
+    <div class="portrait">
+      <span class="badge-role">Modulo 2</span>
+      <img src="personaggi-reference/luca.png" alt="Luca Ferrara" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div class="placeholder" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        Immagine in generazione
+      </div>
+    </div>
+    <div class="content">
+      <h2>Luca Ferrara</h2>
+      <p class="nickname">Lo studente umanista · 23 anni · Padova</p>
+      <span class="module-tag">M2 · Burocrazia & Budget (approfondimento)</span>
+
+      <div class="quick-info">
+        <div><div class="label">Professione</div><div class="value">Studente di Lettere</div></div>
+        <div><div class="label">Famiglia</div><div class="value">Single, fidanzata in Erasmus</div></div>
+        <div><div class="label">Tech-level</div><div class="value">Nativo digitale disordinato</div></div>
+        <div><div class="label">Rapporto Coop</div><div class="value">Spesa low-budget</div></div>
+      </div>
+
+      <div class="section-block">
+        <h3>Problema scatenante</h3>
+        <p>Fine mese in <strong>rosso</strong>. La coinquilina chiede la quota delle bollette, lui non sa quanto ha speso. Apre l'app della banca: caos. Allergico ai numeri ("ho scelto Lettere per un motivo").</p>
+      </div>
+
+      <div class="section-block">
+        <h3>Soluzione AI</h3>
+        <p>Fotografare scontrini e far creare un <strong>budget automatico</strong>. Categorizzare le spese senza fogli Excel. Capire se può permettersi quella cena fuori.</p>
+      </div>
+
+      <div class="section-block">
+        <h3>Carattere</h3>
+        <ul>
+          <li>Intelligente ma disorganizzato — brillante negli esami, disastroso con i soldi</li>
+          <li>Allergico ai numeri e ai fogli di calcolo</li>
+          <li>Ironico e autoironico, linguaggio giovane ma non slang estremo</li>
+          <li>Vive alla giornata, fine mese sempre in ansia</li>
+        </ul>
+      </div>
+
+      <div class="section-block">
+        <h3>Aspetto fisico</h3>
+        <p>1.80m, magro, postura un po' curva da studente. Capelli biondi scuri/castano chiaro, medio-lunghi, mossi e spettinati. Occhi azzurro-grigi con espressione sognante. <strong>Cuffie over-ear sempre al collo</strong>. Braccialetto di stoffa al polso.</p>
+      </div>
+
+      <div class="quote">Excel? Ho provato dieci minuti, poi ho chiuso tutto.</div>
+
+      <div class="curiosities">
+        <h4>Curiosità & dettagli</h4>
+        <ul>
+          <li>Vive in un appartamento condiviso con altri 2 studenti a Padova</li>
+          <li>Fidanzata in Erasmus a Lisbona</li>
+          <li>Zaino sempre pieno di libri e fogli spiegazzati</li>
+          <li>Indossa felpe oversize (università, band, colori neutri) e Converse consumate</li>
+          <li>Arco emotivo: panico → tentativo fallito → suggerimento → scoperta AI → sorpresa</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</article>
+
+<!-- PAOLA -->
+<article id="paola" class="character-card">
+  <div class="card-inner">
+    <div class="portrait">
+      <span class="badge-role">Modulo 3</span>
+      <img src="personaggi-reference/paola.png" alt="Paola Gentili" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div class="placeholder" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        Immagine in generazione
+      </div>
+    </div>
+    <div class="content">
+      <h2>Paola Gentili</h2>
+      <p class="nickname">L'eco-chef casalinga · 45 anni · Perugia</p>
+      <span class="module-tag">M3 · Sostenibilità in cucina e benessere</span>
+
+      <div class="quick-info">
+        <div><div class="label">Professione</div><div class="value">Bibliotecaria part-time</div></div>
+        <div><div class="label">Famiglia</div><div class="value">Sposata, 2 figli (12 e 16)</div></div>
+        <div><div class="label">Tech-level</div><div class="value">Più aperta di quel che pensa</div></div>
+        <div><div class="label">Socia Coop</div><div class="value">Da 10 anni, ama il bio</div></div>
+      </div>
+
+      <div class="section-block">
+        <h3>Problema scatenante</h3>
+        <p>Mercoledì sera, apre il frigo: <strong>mezzo peperone, zucchine avanzate, un pezzo di formaggio, pasta di ieri</strong>. Deve cucinare per 4. Non vuole buttare niente, non ha idee.</p>
+      </div>
+
+      <div class="section-block">
+        <h3>Soluzione AI</h3>
+        <p><strong>La magia del frigo vuoto</strong>: fotografare gli avanzi e ricevere ricette zero-waste personalizzate. Chiedere sostituzioni intelligenti per ingredienti mancanti. Pianificare la spesa per ridurre sprechi.</p>
+      </div>
+
+      <div class="section-block">
+        <h3>Carattere</h3>
+        <ul>
+          <li>Attenta allo spreco per principio e necessità economica</li>
+          <li>Creativa in cucina ma in un loop di ricette ripetitive</li>
+          <li>Curiosa, più aperta alla tecnologia di quanto pensi</li>
+          <li>Pratica e organizzata, ma sopraffatta dalla routine familiare</li>
+        </ul>
+      </div>
+
+      <div class="section-block">
+        <h3>Aspetto fisico</h3>
+        <p>1.62m, corporatura morbida e accogliente. Viso tondo, guance piene, sorriso facile. Capelli castano scuro, mossi/ricci, lunghi fino a metà schiena, spesso in chignon morbido disordinato. Occhi marroni luminosi. <strong>Grembiule quasi sempre addosso</strong>.</p>
+      </div>
+
+      <div class="quote">Ogni domenica butto via la lattuga. Mi dà fastidio anche solo pensarci.</div>
+
+      <div class="curiosities">
+        <h4>Curiosità & dettagli</h4>
+        <ul>
+          <li>Vive a Perugia in una casa con piccolo giardino</li>
+          <li>Lavora part-time nella biblioteca comunale</li>
+          <li>Linguaggio caldo, materno, gesticola molto</li>
+          <li>Outfit tipico: maglietta a righe + grembiule, cardigan morbido</li>
+          <li>Arco emotivo: frustrazione → tentativo Google fallito → AI → entusiasmo → strumenti avanzati</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</article>
+
+<!-- GIULIA -->
+<article id="giulia" class="character-card">
+  <div class="card-inner">
+    <div class="portrait">
+      <span class="badge-role">Modulo 4</span>
+      <img src="personaggi-reference/giulia.png" alt="Giulia Ferraro" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div class="placeholder" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        Immagine in generazione
+      </div>
+    </div>
+    <div class="content">
+      <h2>Giulia Ferraro</h2>
+      <p class="nickname">La volontaria multitasking · 58 anni · Bari</p>
+      <span class="module-tag">M4 · Partecipazione, creatività e comunità</span>
+
+      <div class="quick-info">
+        <div><div class="label">Professione</div><div class="value">Ex insegnante in pensione</div></div>
+        <div><div class="label">Famiglia</div><div class="value">Vedova, 2 figlie adulte</div></div>
+        <div><div class="label">Tech-level</div><div class="value">Poco tech, ma curiosa</div></div>
+        <div><div class="label">Socia Coop</div><div class="value">Da 25 anni, attivissima</div></div>
+      </div>
+
+      <div class="section-block">
+        <h3>Problema scatenante</h3>
+        <p>Deve organizzare la <strong>cena di beneficenza annuale</strong>: 80 invitati, volantini, comunicati, turni dei volontari, verbale dell'ultima riunione, bando per il contributo comunale. Tutto da sola con Word e i post-it.</p>
+      </div>
+
+      <div class="section-block">
+        <h3>Soluzione AI</h3>
+        <p><strong>La segretaria virtuale 2.0</strong>: automatizzare verbali, creare turni organizzativi, scrivere bandi di fundraising. <strong>Art direction accessibile</strong>: generare locandine professionali senza grafico.</p>
+      </div>
+
+      <div class="section-block">
+        <h3>Carattere</h3>
+        <ul>
+          <li>Energia inesauribile, sempre con tre cose da fare</li>
+          <li>Generosa fino all'eccesso — non sa dire no</li>
+          <li>Organizzata a modo suo (post-it ovunque, agenda cartacea)</li>
+          <li>Poco tech ma non ha paura di provare</li>
+        </ul>
+      </div>
+
+      <div class="section-block">
+        <h3>Aspetto fisico</h3>
+        <p>1.58m, minuta ma energica, movimenti rapidi. Capelli grigio-argento naturali, corti taglio sbarazzino. Occhi neri vivacissimi. <strong>Occhiali da lettura colorati (rosso ciliegia o blu) tenuti in testa come cerchietto</strong>. Vestiti colorati (turchese, arancio, giallo senape) con sciarpina.</p>
+      </div>
+
+      <div class="quote">Non ce la faccio, mi servirebbero tre di me.</div>
+
+      <div class="curiosities">
+        <h4>Curiosità & dettagli</h4>
+        <ul>
+          <li>Vive a Bari nel quartiere Libertà</li>
+          <li>Una figlia a Milano, una a Bari</li>
+          <li>Linguaggio vivace, meridionale, colorito, affettuoso</li>
+          <li>Borsa grande piena di fogli, penne, caramelle per i nipoti</li>
+          <li>Collana con ciondolo portafortuna, gesticola moltissimo</li>
+          <li>Arco emotivo: sovraccarico → crisi → link dal figlio → scoperta → meraviglia creativa</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</article>
+
+<!-- ROBERTO -->
+<article id="roberto" class="character-card">
+  <div class="card-inner">
+    <div class="portrait">
+      <span class="badge-role">Modulo 5</span>
+      <img src="personaggi-reference/roberto.png" alt="Roberto Mancini" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div class="placeholder" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        Immagine in generazione
+      </div>
+    </div>
+    <div class="content">
+      <h2>Roberto Mancini</h2>
+      <p class="nickname">Il cittadino informato · 67 anni · Torino</p>
+      <span class="module-tag">M5 · Difesa personale digitale</span>
+
+      <div class="quick-info">
+        <div><div class="label">Professione</div><div class="value">Pensionato (ex Poste)</div></div>
+        <div><div class="label">Famiglia</div><div class="value">Sposato, due nipoti piccoli</div></div>
+        <div><div class="label">Tech-level</div><div class="value">Prudente, quasi sospettoso</div></div>
+        <div><div class="label">Socio Coop</div><div class="value">Da 30 anni</div></div>
+      </div>
+
+      <div class="section-block">
+        <h3>Problema scatenante</h3>
+        <p>Riceve un <strong>SMS truffa</strong> dalla "banca" che chiede di aggiornare i dati. Quasi ci casca. Il nipote gli mostra un video di un politico che dice cose assurde: "Nonno, è un deepfake!" Roberto non sa nemmeno cosa sia.</p>
+      </div>
+
+      <div class="section-block">
+        <h3>Soluzione AI</h3>
+        <p><strong>Digital self-defense</strong>: riconoscere deepfake (video e audio), fare fact-checking assistito, difendersi da phishing e truffe digitali. Da vittima potenziale a <strong>sentinella della famiglia</strong>.</p>
+      </div>
+
+      <div class="section-block">
+        <h3>Carattere</h3>
+        <ul>
+          <li>Prudente, quasi sospettoso — "se sembra troppo bello, c'è la fregatura"</li>
+          <li>Informato ma confuso: legge giornali, guarda TG, ma le notizie si contraddicono</li>
+          <li>Protettivo verso la famiglia, specialmente i nipoti online</li>
+          <li>Dignitoso, non vuole sentirsi "vecchio che non capisce"</li>
+        </ul>
+      </div>
+
+      <div class="section-block">
+        <h3>Aspetto fisico</h3>
+        <p>1.75m, corporatura media leggermente appesantita, postura dritta (orgoglio). Capelli grigi tendenti al bianco, corti, riga laterale. Occhi grigio-azzurri attenti e diffidenti. <strong>Occhiali bifocali rettangolari in metallo argentato</strong>. Penna sempre nel taschino, orologio analogico.</p>
+      </div>
+
+      <div class="quote">Se sembra troppo bello, c'è la fregatura.</div>
+
+      <div class="curiosities">
+        <h4>Curiosità & dettagli</h4>
+        <ul>
+          <li>Vive a Torino, zona San Salvario, con la moglie Annamaria</li>
+          <li>30 anni di servizio alle Poste — orgoglio professionale</li>
+          <li>Linguaggio formale-informale piemontese, pacato, a volte brontolone</li>
+          <li>Outfit: camicia + gilet/maglione V, pantaloni classici, scarpe in pelle</li>
+          <li>Arco emotivo: quasi-truffa → confusione → difesa → empowerment → sentinella</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</article>
+
+</div>
+
+<footer>
+  <p><strong>AI per la vita quotidiana</strong> · Bibbia personaggi · Produzione EIIS per Coop</p>
+  <p style="margin-top:8px;opacity:0.7">Tutti gli avatar sono generati con AI (Nano Banana / Gemini) per garantire consistenza visiva tra moduli.</p>
+</footer>
+
+</body>
+</html>
