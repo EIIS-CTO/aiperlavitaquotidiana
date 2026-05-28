@@ -288,6 +288,31 @@ body{display:flex;align-items:center;justify-content:center;padding:20px}
 @keyframes flashOut{0%{opacity:1}100%{opacity:0}}
 
 /* ============================================================
+   AUDIO TOGGLE BUTTON
+============================================================ */
+#audio-toggle{
+  position:absolute;bottom:14px;left:14px;z-index:300;
+  width:48px;height:48px;border-radius:50%;
+  background:#fff;border:3px solid var(--black);
+  box-shadow:0 4px 0 var(--black);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:22px;line-height:1;padding:0;
+  transition:transform .12s, box-shadow .12s, background .15s;
+}
+#audio-toggle:hover{transform:translateY(2px);box-shadow:0 2px 0 var(--black);background:var(--red-soft)}
+#audio-toggle:active{transform:translateY(4px);box-shadow:0 0 0 var(--black)}
+#audio-toggle.off{background:var(--paper);opacity:.75}
+#audio-toggle .pulse{
+  position:absolute;inset:-3px;border-radius:50%;
+  border:2px solid var(--red);opacity:0;pointer-events:none;
+}
+#audio-toggle:not(.off) .pulse{animation:audioPulse 2s ease-out infinite}
+@keyframes audioPulse{
+  0%{transform:scale(1);opacity:.55}
+  100%{transform:scale(1.45);opacity:0}
+}
+
+/* ============================================================
    RESPONSIVE SCALING
 ============================================================ */
 @media (max-width:1340px){
@@ -356,6 +381,12 @@ body{display:flex;align-items:center;justify-content:center;padding:20px}
     </div>
   </div>
 
+  <!-- ============= AUDIO TOGGLE ============= -->
+  <button id="audio-toggle" onclick="toggleAudio(event)" title="Musica on/off · tasto M">
+    <span class="pulse"></span>
+    <span id="audio-icon">🔊</span>
+  </button>
+
   <!-- ============= ENDING SCREEN ============= -->
   <div id="end-screen" class="layer">
     <div class="kicker" id="end-kicker">Fine episodio</div>
@@ -375,6 +406,116 @@ body{display:flex;align-items:center;justify-content:center;padding:20px}
 
 <script>
 'use strict';
+
+/* ============================================================
+   AUDIO ENGINE — procedural Web Audio loop
+   melodia + basso in DO maggiore (I–IV–V–I)
+   ~92 BPM, tono caldo, in linea con lo stile fumetto
+============================================================ */
+const audio = {
+  ctx: null,
+  master: null,
+  enabled: localStorage.getItem('gameMusicOn') !== '0',
+  nextStartTime: 0,
+  timeoutId: null,
+  bpm: 92,
+  level: 0.32,
+};
+
+// 16 beats (4 misure 4/4) — progressione I IV V I
+const MELODY = [
+  // bar 1 (C)
+  { n: 67, d: 0.5 }, { n: 69, d: 0.5 }, { n: 67, d: 0.5 }, { n: 64, d: 0.5 },
+  { n: 60, d: 1 },   { n: 62, d: 1 },
+  // bar 2 (F)
+  { n: 65, d: 0.5 }, { n: 69, d: 0.5 }, { n: 72, d: 0.5 }, { n: 69, d: 0.5 },
+  { n: 65, d: 1 },   { n: 64, d: 1 },
+  // bar 3 (G)
+  { n: 62, d: 0.5 }, { n: 65, d: 0.5 }, { n: 67, d: 0.5 }, { n: 69, d: 0.5 },
+  { n: 67, d: 2 },
+  // bar 4 (C)
+  { n: 64, d: 0.5 }, { n: 62, d: 0.5 }, { n: 60, d: 3 },
+];
+const BASS = [
+  { n: 36, d: 4 }, // C2
+  { n: 41, d: 4 }, // F2
+  { n: 43, d: 4 }, // G2
+  { n: 36, d: 4 }, // C2
+];
+
+function midiToFreq(n){ return 440 * Math.pow(2, (n - 69) / 12); }
+
+function playNote(freq, when, dur, type, level){
+  if (!audio.ctx) return;
+  const o = audio.ctx.createOscillator();
+  const g = audio.ctx.createGain();
+  o.type = type;
+  o.frequency.setValueAtTime(freq, when);
+  o.connect(g);
+  g.connect(audio.master);
+  g.gain.setValueAtTime(0, when);
+  g.gain.linearRampToValueAtTime(level, when + 0.015);
+  g.gain.exponentialRampToValueAtTime(Math.max(level * 0.4, 0.0001), when + dur * 0.55);
+  g.gain.exponentialRampToValueAtTime(0.0001, when + dur);
+  o.start(when);
+  o.stop(when + dur + 0.06);
+}
+
+function scheduleLoop(){
+  if (!audio.ctx) return;
+  const beatDur = 60 / audio.bpm;
+  const startTime = audio.nextStartTime || (audio.ctx.currentTime + 0.1);
+
+  let t = startTime;
+  for (const n of MELODY){
+    if (n.n !== null) playNote(midiToFreq(n.n), t, n.d * beatDur * 0.9, 'triangle', 0.07);
+    t += n.d * beatDur;
+  }
+  let bt = startTime;
+  for (const b of BASS){
+    playNote(midiToFreq(b.n), bt, b.d * beatDur * 0.92, 'sine', 0.10);
+    bt += b.d * beatDur;
+  }
+
+  const loopDur = 16 * beatDur;
+  audio.nextStartTime = startTime + loopDur;
+  audio.timeoutId = setTimeout(scheduleLoop, loopDur * 1000 - 250);
+}
+
+function initAudio(){
+  if (audio.ctx) return;
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!AC) return;
+  audio.ctx = new AC();
+  audio.master = audio.ctx.createGain();
+  audio.master.gain.value = audio.enabled ? audio.level : 0;
+  audio.master.connect(audio.ctx.destination);
+  scheduleLoop();
+  updateAudioIcon();
+}
+
+function toggleAudio(ev){
+  if (ev) ev.stopPropagation();
+  audio.enabled = !audio.enabled;
+  localStorage.setItem('gameMusicOn', audio.enabled ? '1' : '0');
+  if (!audio.ctx) {
+    initAudio();
+  } else {
+    const now = audio.ctx.currentTime;
+    audio.master.gain.cancelScheduledValues(now);
+    audio.master.gain.setValueAtTime(audio.master.gain.value, now);
+    audio.master.gain.linearRampToValueAtTime(audio.enabled ? audio.level : 0, now + 0.3);
+    if (audio.ctx.state === 'suspended') audio.ctx.resume();
+  }
+  updateAudioIcon();
+}
+
+function updateAudioIcon(){
+  const icon = document.getElementById('audio-icon');
+  const btn = document.getElementById('audio-toggle');
+  if (icon) icon.textContent = audio.enabled ? '🔊' : '🔇';
+  if (btn) btn.classList.toggle('off', !audio.enabled);
+}
 
 /* ============================================================
    SVG ASSETS — Zerocalcare-flat style sprites
@@ -1309,6 +1450,7 @@ window.next = function(){
    ENTRY POINTS
 ============================================================ */
 function start(){
+  initAudio(); // user gesture: ora possiamo partire con l'audio
   state.scene = 'intro_1';
   state.privacy = 0;
   state.knowledge = 0;
@@ -1325,6 +1467,8 @@ function restart(){
    KEYBOARD: space/enter to advance, 1-4 for choices
 ============================================================ */
 window.addEventListener('keydown', (e) => {
+  // M toggles audio anywhere
+  if (e.key === 'm' || e.key === 'M') { toggleAudio(); return; }
   // only when scene screen active
   if (!$('scene-screen').classList.contains('active')) return;
   const s = scenes[state.scene];
@@ -1341,6 +1485,7 @@ window.addEventListener('keydown', (e) => {
 // Show title on load
 window.addEventListener('DOMContentLoaded', () => {
   showScreen('title-screen');
+  updateAudioIcon();
 });
 </script>
 </body>
