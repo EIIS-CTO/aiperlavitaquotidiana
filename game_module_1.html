@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, initial-scale=1">
+<title>Maria e la Mail Incomprensibile — un gioco Coop × EIIS</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   PALETTE & RESET — Coop × EIIS landing
+============================================================ */
+:root{
+  --red:#E2001A; --red-dk:#B5001A; --red-soft:#FFE3E6;
+  --olive:#A3B644; --olive-dk:#7D8E2F;
+  --black:#111110; --ink:#1E1E1D; --paper:#F4ECE0; --paper-2:#E8D5B7;
+  --cream:#FAF4E8; --gray:#6B6B68; --gray-l:#D9D9D7;
+  --shadow:0 8px 0 #111110;
+  --line:4px solid #111110;
+  --line-2:3px solid #111110;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#1E1E1D;font-family:'Inter',system-ui,sans-serif;color:var(--ink);overflow:hidden}
+body{display:flex;align-items:center;justify-content:center;padding:20px}
+
+/* ============================================================
+   GAME CONTAINER — fixed 1280x720 letterbox, scaled
+============================================================ */
+#root{
+  width:1280px;height:720px;position:relative;
+  background:var(--paper);
+  border:6px solid var(--black);
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow:0 12px 0 var(--black), 0 24px 60px rgba(0,0,0,.4);
+  transform-origin:center center;
+}
+.layer{position:absolute;inset:0}
+
+/* ============================================================
+   TITLE SCREEN
+============================================================ */
+#title-screen{
+  background:radial-gradient(ellipse at center, #FFE3E6 0%, var(--paper) 70%);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+  text-align:center;padding:60px;
+}
+#title-screen .kicker{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:10px 22px;border-radius:9999px;background:var(--red);color:#fff;
+  font-weight:800;letter-spacing:.16em;text-transform:uppercase;font-size:14px;
+  margin-bottom:22px;border:3px solid var(--black);box-shadow:0 4px 0 var(--black);
+}
+#title-screen .kicker::before{content:'';width:8px;height:8px;border-radius:50%;background:#fff}
+#title-screen h1{
+  font-size:84px;font-weight:900;line-height:.94;letter-spacing:-.04em;
+  color:var(--ink);max-width:1100px;margin-bottom:16px;
+}
+#title-screen h1 em{font-style:normal;color:var(--red)}
+#title-screen .subtitle{
+  font-family:'Caveat',cursive;font-size:34px;color:var(--ink);
+  transform:rotate(-2deg);margin-bottom:40px;
+}
+#title-screen .btn-main{
+  font-family:'Inter',sans-serif;font-size:22px;font-weight:800;
+  padding:18px 46px;background:var(--red);color:#fff;border:4px solid var(--black);
+  border-radius:9999px;cursor:pointer;
+  letter-spacing:-.005em;
+  box-shadow:0 6px 0 var(--black);
+  transition:transform .1s, box-shadow .1s;
+}
+#title-screen .btn-main:hover{transform:translateY(2px);box-shadow:0 4px 0 var(--black)}
+#title-screen .btn-main:active{transform:translateY(6px);box-shadow:0 0 0 var(--black)}
+#title-screen .credits{
+  position:absolute;bottom:24px;left:0;right:0;text-align:center;
+  font-size:13px;color:var(--gray);letter-spacing:.18em;text-transform:uppercase;font-weight:600;
+}
+#title-screen .credits b{color:var(--ink)}
+
+/* ============================================================
+   SCENE LAYOUT
+============================================================ */
+#scene-screen{display:none}
+#scene-screen.active{display:block}
+#bg-layer{z-index:1}
+#char-layer{z-index:2;display:flex;align-items:flex-end;justify-content:center;padding-bottom:160px}
+#prop-layer{z-index:3}
+#ui-layer{z-index:5;display:flex;flex-direction:column;justify-content:flex-end;padding:0 60px 30px}
+#hud-layer{z-index:6;display:flex;justify-content:space-between;align-items:flex-start;padding:18px 20px;pointer-events:none;height:auto;top:0;bottom:auto}
+
+/* ============================================================
+   DIALOG BOX
+============================================================ */
+.dialog-box{
+  background:#fff;border:5px solid var(--black);border-radius:18px;
+  padding:24px 32px;position:relative;
+  box-shadow:0 8px 0 var(--black);
+  max-width:1160px;width:100%;margin:0 auto;
+  animation:popIn .25s ease-out;
+}
+@keyframes popIn{0%{transform:translateY(12px) scale(.98);opacity:0}100%{transform:translateY(0) scale(1);opacity:1}}
+.dialog-speaker{
+  display:inline-block;background:var(--red);color:#fff;border:3px solid var(--black);
+  padding:4px 14px;border-radius:9999px;
+  font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  position:absolute;top:-16px;left:24px;
+}
+.dialog-speaker.olive{background:var(--olive-dk)}
+.dialog-speaker.dark{background:var(--ink)}
+.dialog-speaker.cream{background:#fff;color:var(--ink)}
+.dialog-text{
+  font-family:'Inter',sans-serif;font-size:22px;line-height:1.42;color:var(--ink);
+  font-weight:500;letter-spacing:-.01em;min-height:72px;
+  overflow-wrap:break-word;word-wrap:break-word;hyphens:auto;
+}
+.dialog-text em{color:var(--red);font-style:normal;font-weight:700}
+.dialog-text .quote{font-family:'Caveat',cursive;font-size:28px;color:var(--ink);line-height:1.25;display:inline}
+.dialog-next{
+  position:absolute;right:18px;bottom:14px;
+  font-size:13px;color:var(--gray);font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  animation:pulseR 1.2s ease-in-out infinite;
+}
+@keyframes pulseR{50%{opacity:.4;transform:translateX(4px)}}
+
+/* ============================================================
+   CHOICES
+============================================================ */
+.choices{display:flex;flex-direction:column;gap:10px;margin-top:18px;max-width:1160px;width:100%;margin-left:auto;margin-right:auto}
+.choice-btn{
+  font-family:'Inter',sans-serif;font-size:19px;font-weight:700;
+  background:#fff;border:4px solid var(--black);border-radius:14px;
+  padding:14px 22px;text-align:left;cursor:pointer;
+  box-shadow:0 5px 0 var(--black);
+  display:flex;align-items:center;gap:14px;
+  transition:transform .1s, box-shadow .1s, background .1s;
+}
+.choice-btn:hover{background:var(--red-soft);transform:translateY(2px);box-shadow:0 3px 0 var(--black)}
+.choice-btn:active{transform:translateY(5px);box-shadow:0 0 0 var(--black)}
+.choice-btn .num{
+  width:34px;height:34px;border-radius:50%;background:var(--red);color:#fff;
+  border:3px solid var(--black);display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:15px;flex-shrink:0;
+}
+.choice-btn .icon{font-size:24px}
+
+/* ============================================================
+   HUD — stats
+============================================================ */
+.hud-stat{
+  background:#fff;border:3px solid var(--black);border-radius:9999px;
+  padding:7px 16px;font-size:13px;font-weight:800;letter-spacing:.05em;
+  display:inline-flex;align-items:center;gap:8px;
+  box-shadow:0 3px 0 var(--black);
+  height:32px;line-height:1;flex:0 0 auto;
+}
+.hud-stat .dot{width:10px;height:10px;border-radius:50%}
+.hud-stat .dot.privacy{background:var(--olive)}
+.hud-stat .dot.know{background:var(--red)}
+
+/* ============================================================
+   MINI-GAME UI
+============================================================ */
+#mini-screen{display:none;background:linear-gradient(180deg, var(--paper) 0%, var(--paper-2) 100%)}
+#mini-screen.active{display:block}
+#mini-screen .header{
+  position:absolute;top:14px;left:0;right:0;text-align:center;z-index:5;
+}
+#mini-screen .header .ku{
+  display:inline-block;font-size:13px;font-weight:800;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--red);
+}
+#mini-screen .header h2{
+  font-size:30px;font-weight:900;line-height:1;margin-top:6px;letter-spacing:-.02em;
+}
+#mini-screen .letter{
+  position:absolute;top:74px;left:50%;transform:translateX(-50%);
+  width:740px;background:#fff;border:5px solid var(--black);border-radius:14px;
+  padding:30px 36px;box-shadow:0 10px 0 var(--black), 0 24px 50px rgba(0,0,0,.15);
+  font-family:'Inter',sans-serif;
+  z-index:3;
+}
+#mini-screen .letter .h{font-size:13px;color:var(--gray);text-transform:uppercase;letter-spacing:.16em;margin-bottom:6px;font-weight:700}
+#mini-screen .letter h3{font-size:22px;font-weight:900;letter-spacing:-.01em;margin-bottom:14px}
+#mini-screen .letter p{font-size:15px;line-height:1.55;color:var(--ink);margin-bottom:10px}
+.sens{
+  display:inline-block;background:#FFF4D8;border:2px dashed #B58400;border-radius:6px;
+  padding:1px 6px;cursor:pointer;font-weight:700;color:#7A5500;
+  transition:all .15s;
+  position:relative;
+}
+.sens:hover{background:#FFD580;border-color:#7A5500}
+.sens.censored{
+  background:var(--black) !important;color:var(--black) !important;
+  border:2px solid var(--black) !important;cursor:default;
+  user-select:none;
+}
+.sens.censored::after{
+  content:'✓';position:absolute;right:-22px;top:50%;transform:translateY(-50%);
+  color:var(--olive-dk);font-size:14px;font-weight:900;
+}
+#mini-screen .actions{
+  position:absolute;bottom:24px;left:0;right:0;text-align:center;z-index:6;
+}
+#mini-screen .actions .info{
+  font-family:'Inter',sans-serif;font-size:14px;color:var(--ink);
+  margin-bottom:12px;font-weight:600;
+}
+#mini-screen .actions .info b{color:var(--red);font-weight:900}
+.btn-upload{
+  font-family:'Inter',sans-serif;font-size:18px;font-weight:800;
+  background:var(--red);color:#fff;border:4px solid var(--black);
+  padding:13px 36px;border-radius:9999px;cursor:pointer;
+  box-shadow:0 5px 0 var(--black);
+  transition:transform .1s, box-shadow .1s;
+}
+.btn-upload:hover{transform:translateY(2px);box-shadow:0 3px 0 var(--black)}
+.btn-upload:active{transform:translateY(5px);box-shadow:0 0 0 var(--black)}
+
+/* ============================================================
+   ENDING SCREEN
+============================================================ */
+#end-screen{display:none;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:60px}
+#end-screen.active{display:flex}
+#end-screen.good{background:linear-gradient(135deg, var(--olive) 0%, var(--olive-dk) 100%);color:#fff}
+#end-screen.medium{background:linear-gradient(135deg, #F5D67A 0%, #C68F1A 100%);color:var(--ink)}
+#end-screen.bad{background:linear-gradient(135deg, var(--red) 0%, #8B0010 100%);color:#fff}
+#end-screen .kicker{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:10px 22px;border-radius:9999px;background:rgba(0,0,0,.25);color:#fff;
+  font-weight:800;letter-spacing:.16em;text-transform:uppercase;font-size:14px;
+  margin-bottom:24px;border:3px solid var(--black);box-shadow:0 4px 0 var(--black);
+}
+#end-screen.medium .kicker{background:rgba(0,0,0,.2);color:var(--ink)}
+#end-screen .kicker::before{content:'';width:8px;height:8px;border-radius:50%;background:#fff}
+#end-screen.medium .kicker::before{background:var(--ink)}
+#end-screen h1{font-size:72px;font-weight:900;line-height:.96;letter-spacing:-.04em;margin-bottom:22px;max-width:1100px}
+#end-screen p{font-size:24px;font-weight:500;line-height:1.4;max-width:900px;margin-bottom:28px;opacity:.9}
+#end-screen .stats{display:flex;gap:18px;margin-bottom:34px}
+#end-screen .stat{
+  background:#fff;color:var(--ink);
+  border:4px solid var(--black);border-radius:14px;
+  padding:14px 22px;text-align:center;
+  box-shadow:0 5px 0 var(--black);
+}
+#end-screen .stat .v{font-size:32px;font-weight:900;line-height:1}
+#end-screen .stat .l{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-top:4px;color:var(--gray)}
+#end-screen .actions{display:flex;gap:14px}
+#end-screen .btn-replay,#end-screen .btn-cta{
+  font-family:'Inter',sans-serif;font-size:18px;font-weight:800;
+  padding:14px 30px;border-radius:9999px;cursor:pointer;
+  border:4px solid var(--black);box-shadow:0 5px 0 var(--black);
+  transition:transform .1s, box-shadow .1s;
+}
+#end-screen .btn-replay{background:#fff;color:var(--ink)}
+#end-screen .btn-cta{background:var(--ink);color:#fff}
+#end-screen .btn-replay:hover,#end-screen .btn-cta:hover{transform:translateY(2px);box-shadow:0 3px 0 var(--black)}
+#end-screen .btn-replay:active,#end-screen .btn-cta:active{transform:translateY(5px);box-shadow:0 0 0 var(--black)}
+
+/* ============================================================
+   CHARACTERS
+============================================================ */
+.character{
+  position:absolute;bottom:170px;
+  animation:bobIn .4s ease-out;
+  filter:drop-shadow(0 12px 0 rgba(0,0,0,.2));
+}
+.character.left{left:80px}
+.character.right{right:80px}
+.character.center{left:50%;transform:translateX(-50%)}
+@keyframes bobIn{
+  0%{transform:translateY(20px) scale(.95);opacity:0}
+  60%{transform:translateY(-4px) scale(1.02)}
+  100%{transform:translateY(0) scale(1);opacity:1}
+}
+.character.center{animation:bobInCenter .4s ease-out}
+@keyframes bobInCenter{
+  0%{transform:translateX(-50%) translateY(20px) scale(.95);opacity:0}
+  60%{transform:translateX(-50%) translateY(-4px) scale(1.02)}
+  100%{transform:translateX(-50%) translateY(0) scale(1);opacity:1}
+}
+
+/* ============================================================
+   SCENE TRANSITION
+============================================================ */
+.flash{
+  position:absolute;inset:0;background:#fff;z-index:99;
+  animation:flashOut .4s ease-out forwards;pointer-events:none;
+}
+@keyframes flashOut{0%{opacity:1}100%{opacity:0}}
+
+/* ============================================================
+   RESPONSIVE SCALING
+============================================================ */
+@media (max-width:1340px){
+  #root{transform:scale(.85)}
+}
+@media (max-width:1100px){
+  #root{transform:scale(.7)}
+}
+@media (max-width:900px){
+  #root{transform:scale(.55)}
+}
+@media (max-width:730px){
+  #root{transform:scale(.42)}
+}
+@media (max-width:560px){
+  #root{transform:scale(.32)}
+}
+</style>
+</head>
+<body>
+<div id="root">
+
+  <!-- ============= TITLE SCREEN ============= -->
+  <div id="title-screen" class="layer">
+    <div class="kicker">Coop × EIIS · un gioco</div>
+    <h1>Maria e la <em>mail</em><br>incomprensibile</h1>
+    <div class="subtitle">~ una piccola storia di intelligenza artificiale e dignità ~</div>
+    <button class="btn-main" onclick="start()">Inizia →</button>
+    <div class="credits">basato sul corso <b>AI per la vita quotidiana</b> · coop.it</div>
+  </div>
+
+  <!-- ============= SCENE SCREEN ============= -->
+  <div id="scene-screen" class="layer">
+    <div id="bg-layer" class="layer"></div>
+    <div id="char-layer" class="layer"></div>
+    <div id="prop-layer" class="layer"></div>
+    <div id="hud-layer" class="layer">
+      <div class="hud-stat"><span class="dot privacy"></span><span>Privacy <span id="hud-p">0</span></span></div>
+      <div class="hud-stat"><span class="dot know"></span><span>Sapere <span id="hud-k">0</span></span></div>
+    </div>
+    <div id="ui-layer" class="layer">
+      <div id="dialog-host"></div>
+      <div id="choices-host" class="choices"></div>
+    </div>
+  </div>
+
+  <!-- ============= MINI-GAME SCREEN ============= -->
+  <div id="mini-screen" class="layer">
+    <div class="header">
+      <div class="ku">Mini sfida · Prima di caricare</div>
+      <h2>Oscura i dati personali sulla lettera</h2>
+    </div>
+    <div class="letter" id="letter-body">
+      <div class="h">Amministrazione del Condominio "Le Magnolie" · Bologna</div>
+      <h3>Diffida — Art. 2051 c.c.</h3>
+      <p>Spett.le <span class="sens" data-k="name">Sig.ra Maria Ferretti</span>,<br>
+      residente in <span class="sens" data-k="addr">Via Aldo Moro 42, int. 7 · Bologna</span>,<br>
+      C.F. <span class="sens" data-k="cf">FRRMRA73L51A944P</span>.</p>
+      <p>Con la presente Le si contesta, ai sensi dell'articolo 2051 del codice civile, la responsabilità per le infiltrazioni d'acqua provenienti dall'appartamento di Sua proprietà nei confronti dell'appartamento sottostante.</p>
+      <p>La invitiamo a far pervenire formale riscontro entro <b>15 (quindici) giorni</b> dalla ricezione, al numero <span class="sens" data-k="phone">+39 051 234 5678</span>, recapito personale dell'amministratore <span class="sens" data-k="amm">geom. Giorgio Bonelli</span>.</p>
+      <p>Distinti saluti.</p>
+    </div>
+    <div class="actions">
+      <div class="info" id="mini-info">Hai oscurato <b id="mini-count">0/5</b> dati sensibili. Carica solo quando sei sicura.</div>
+      <button class="btn-upload" onclick="uploadLetter()">Carica nell'AI →</button>
+    </div>
+  </div>
+
+  <!-- ============= ENDING SCREEN ============= -->
+  <div id="end-screen" class="layer">
+    <div class="kicker" id="end-kicker">Fine episodio</div>
+    <h1 id="end-title"></h1>
+    <p id="end-body"></p>
+    <div class="stats">
+      <div class="stat"><div class="v" id="stat-p">0</div><div class="l">Privacy</div></div>
+      <div class="stat"><div class="v" id="stat-k">0</div><div class="l">Sapere</div></div>
+    </div>
+    <div class="actions">
+      <button class="btn-replay" onclick="restart()">↻ Rigioca</button>
+      <a class="btn-cta" href="https://www.coop.it/eventi/2794/aiperlavitaquotidiana" target="_blank" rel="noopener">Vai al corso vero →</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+'use strict';
+
+/* ============================================================
+   SVG ASSETS — Zerocalcare-flat style sprites
+   tutti con stroke nera spessa, colori piatti
+============================================================ */
+const SVG = {
+  // ----- BACKGROUNDS -----
+  bgCoop: () => `
+    <svg viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <rect width="1280" height="720" fill="#E8D5B7"/>
+      <!-- ceiling lights -->
+      <rect x="0" y="0" width="1280" height="80" fill="#F4ECE0" stroke="#111110" stroke-width="4"/>
+      <g stroke="#111110" stroke-width="3">
+        <line x1="160" y1="0" x2="160" y2="80"/>
+        <line x1="420" y1="0" x2="420" y2="80"/>
+        <line x1="680" y1="0" x2="680" y2="80"/>
+        <line x1="940" y1="0" x2="940" y2="80"/>
+        <line x1="1200" y1="0" x2="1200" y2="80"/>
+      </g>
+      <!-- shelves -->
+      <g fill="#fff" stroke="#111110" stroke-width="4">
+        <rect x="40" y="120" width="280" height="370"/>
+        <rect x="40" y="170" width="280" height="3"/>
+        <rect x="40" y="260" width="280" height="3"/>
+        <rect x="40" y="350" width="280" height="3"/>
+        <rect x="40" y="440" width="280" height="3"/>
+      </g>
+      <!-- products on shelf -->
+      <g stroke="#111110" stroke-width="3">
+        <rect x="60" y="130" width="40" height="36" fill="#E2001A"/>
+        <rect x="110" y="130" width="40" height="36" fill="#A3B644"/>
+        <rect x="160" y="130" width="40" height="36" fill="#F5D67A"/>
+        <rect x="210" y="130" width="40" height="36" fill="#2C7BCF"/>
+        <rect x="260" y="130" width="40" height="36" fill="#fff"/>
+        <rect x="60" y="180" width="50" height="76" fill="#E2001A"/>
+        <rect x="120" y="180" width="50" height="76" fill="#FAF4E8"/>
+        <rect x="180" y="180" width="50" height="76" fill="#2C7BCF"/>
+        <rect x="240" y="180" width="50" height="76" fill="#A3B644"/>
+        <rect x="60" y="270" width="60" height="76" fill="#F5D67A"/>
+        <rect x="130" y="270" width="60" height="76" fill="#FAF4E8"/>
+        <rect x="200" y="270" width="60" height="76" fill="#E2001A"/>
+        <rect x="60" y="360" width="100" height="70" fill="#fff"/>
+        <rect x="170" y="360" width="100" height="70" fill="#A3B644"/>
+        <rect x="60" y="450" width="240" height="35" fill="#FAF4E8"/>
+      </g>
+      <!-- right shelves -->
+      <g fill="#fff" stroke="#111110" stroke-width="4">
+        <rect x="960" y="120" width="280" height="370"/>
+        <rect x="960" y="170" width="280" height="3"/>
+        <rect x="960" y="260" width="280" height="3"/>
+        <rect x="960" y="350" width="280" height="3"/>
+        <rect x="960" y="440" width="280" height="3"/>
+      </g>
+      <g stroke="#111110" stroke-width="3">
+        <rect x="980" y="130" width="36" height="36" fill="#A3B644"/>
+        <rect x="1024" y="130" width="36" height="36" fill="#E2001A"/>
+        <rect x="1068" y="130" width="36" height="36" fill="#F5D67A"/>
+        <rect x="1112" y="130" width="36" height="36" fill="#2C7BCF"/>
+        <rect x="1156" y="130" width="36" height="36" fill="#fff"/>
+        <rect x="1200" y="130" width="36" height="36" fill="#E2001A"/>
+        <rect x="980" y="180" width="50" height="76" fill="#FAF4E8"/>
+        <rect x="1040" y="180" width="50" height="76" fill="#E2001A"/>
+        <rect x="1100" y="180" width="50" height="76" fill="#A3B644"/>
+        <rect x="1160" y="180" width="50" height="76" fill="#2C7BCF"/>
+        <rect x="980" y="270" width="80" height="76" fill="#fff"/>
+        <rect x="1070" y="270" width="80" height="76" fill="#F5D67A"/>
+        <rect x="1160" y="270" width="80" height="76" fill="#E2001A"/>
+        <rect x="980" y="360" width="120" height="70" fill="#A3B644"/>
+        <rect x="1110" y="360" width="120" height="70" fill="#fff"/>
+        <rect x="980" y="450" width="250" height="35" fill="#FAF4E8"/>
+      </g>
+      <!-- floor -->
+      <rect x="0" y="490" width="1280" height="230" fill="#D9CDB8" stroke="#111110" stroke-width="4"/>
+      <g stroke="#111110" stroke-width="2" opacity=".25">
+        <line x1="0" y1="540" x2="1280" y2="540"/>
+        <line x1="0" y1="590" x2="1280" y2="590"/>
+        <line x1="0" y1="640" x2="1280" y2="640"/>
+        <line x1="0" y1="690" x2="1280" y2="690"/>
+      </g>
+      <!-- COOP sign -->
+      <g transform="translate(530, 110)">
+        <rect width="220" height="60" fill="#E2001A" stroke="#111110" stroke-width="4" rx="6"/>
+        <text x="110" y="42" text-anchor="middle" fill="#fff" font-family="Inter" font-weight="900" font-size="32" letter-spacing="2">COOP</text>
+      </g>
+    </svg>`,
+
+  bgKitchen: () => `
+    <svg viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <rect width="1280" height="720" fill="#FAF0DA"/>
+      <!-- wall pattern -->
+      <g fill="#F5E4C0" stroke="#111110" stroke-width="2" opacity=".5">
+        <rect x="0" y="80" width="1280" height="40"/>
+      </g>
+      <!-- window -->
+      <g stroke="#111110" stroke-width="5" fill="#C9E5F2">
+        <rect x="80" y="130" width="280" height="220"/>
+        <line x1="80" y1="240" x2="360" y2="240"/>
+        <line x1="220" y1="130" x2="220" y2="350"/>
+      </g>
+      <!-- sun -->
+      <circle cx="160" cy="200" r="30" fill="#F5D67A" stroke="#111110" stroke-width="4"/>
+      <!-- frame for window -->
+      <rect x="68" y="118" width="304" height="244" fill="none" stroke="#111110" stroke-width="6"/>
+      <!-- shelf -->
+      <rect x="440" y="180" width="380" height="14" fill="#A87044" stroke="#111110" stroke-width="4"/>
+      <!-- shelf items -->
+      <g stroke="#111110" stroke-width="3">
+        <rect x="460" y="130" width="36" height="50" fill="#E2001A"/>
+        <rect x="510" y="120" width="46" height="60" fill="#FAF4E8"/>
+        <rect x="570" y="135" width="40" height="45" fill="#A3B644"/>
+        <circle cx="640" cy="155" r="22" fill="#2C7BCF"/>
+        <rect x="680" y="120" width="48" height="60" fill="#F5D67A"/>
+        <rect x="740" y="140" width="42" height="40" fill="#E2001A"/>
+      </g>
+      <!-- frame painting -->
+      <g transform="translate(880, 130)">
+        <rect x="0" y="0" width="180" height="140" fill="#FAF4E8" stroke="#111110" stroke-width="6"/>
+        <circle cx="60" cy="50" r="18" fill="#F5D67A" stroke="#111110" stroke-width="3"/>
+        <path d="M 20 110 L 60 70 L 100 100 L 140 60 L 170 90 L 170 130 L 20 130 Z" fill="#A3B644" stroke="#111110" stroke-width="3"/>
+      </g>
+      <!-- counter -->
+      <rect x="0" y="480" width="1280" height="60" fill="#D8C49A" stroke="#111110" stroke-width="5"/>
+      <!-- table -->
+      <rect x="0" y="540" width="1280" height="180" fill="#A87044" stroke="#111110" stroke-width="5"/>
+      <g stroke="#111110" stroke-width="2" opacity=".25">
+        <line x1="0" y1="600" x2="1280" y2="600"/>
+        <line x1="0" y1="660" x2="1280" y2="660"/>
+      </g>
+      <!-- letter on the table -->
+      <g transform="translate(880, 500) rotate(-3)">
+        <rect x="0" y="0" width="180" height="120" fill="#FFFAF0" stroke="#111110" stroke-width="4"/>
+        <line x1="14" y1="30" x2="160" y2="30" stroke="#111110" stroke-width="2"/>
+        <line x1="14" y1="50" x2="160" y2="50" stroke="#111110" stroke-width="2"/>
+        <line x1="14" y1="70" x2="120" y2="70" stroke="#111110" stroke-width="2"/>
+        <line x1="14" y1="90" x2="160" y2="90" stroke="#111110" stroke-width="2"/>
+        <rect x="14" y="14" width="40" height="10" fill="#E2001A" stroke="#111110" stroke-width="2"/>
+      </g>
+      <!-- mug -->
+      <g transform="translate(180, 470)">
+        <ellipse cx="50" cy="20" rx="36" ry="8" fill="#fff" stroke="#111110" stroke-width="3"/>
+        <path d="M 14 20 L 18 80 Q 18 92 30 94 L 70 94 Q 82 92 82 80 L 86 20 Z" fill="#E2001A" stroke="#111110" stroke-width="3"/>
+        <path d="M 84 36 Q 100 36 100 52 Q 100 68 84 68" fill="none" stroke="#111110" stroke-width="3"/>
+        <text x="50" y="64" text-anchor="middle" fill="#fff" font-family="Inter" font-weight="900" font-size="14">Coop</text>
+      </g>
+    </svg>`,
+
+  bgOffice: () => `
+    <svg viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <rect width="1280" height="720" fill="#F4ECE0"/>
+      <!-- big window -->
+      <g stroke="#111110" stroke-width="6">
+        <rect x="60" y="40" width="500" height="380" fill="#C9E5F2"/>
+        <line x1="310" y1="40" x2="310" y2="420" stroke-width="5"/>
+        <line x1="60" y1="230" x2="560" y2="230" stroke-width="4"/>
+      </g>
+      <!-- buildings outside -->
+      <g fill="#A3B644" stroke="#111110" stroke-width="3">
+        <rect x="76" y="280" width="60" height="140"/>
+        <rect x="146" y="240" width="80" height="180"/>
+        <rect x="234" y="300" width="70" height="120"/>
+        <rect x="312" y="260" width="90" height="160"/>
+        <rect x="412" y="220" width="60" height="200"/>
+        <rect x="480" y="280" width="80" height="140"/>
+      </g>
+      <!-- windows on buildings -->
+      <g fill="#F5D67A" stroke="#111110" stroke-width="2">
+        <rect x="86" y="300" width="10" height="12"/>
+        <rect x="106" y="300" width="10" height="12"/>
+        <rect x="160" y="260" width="12" height="14"/>
+        <rect x="180" y="260" width="12" height="14"/>
+        <rect x="200" y="260" width="12" height="14"/>
+        <rect x="430" y="240" width="14" height="16"/>
+        <rect x="500" y="300" width="12" height="14"/>
+      </g>
+      <!-- bookshelf right -->
+      <rect x="900" y="60" width="280" height="380" fill="#A87044" stroke="#111110" stroke-width="5"/>
+      <g stroke="#111110" stroke-width="3">
+        <line x1="900" y1="150" x2="1180" y2="150"/>
+        <line x1="900" y1="240" x2="1180" y2="240"/>
+        <line x1="900" y1="330" x2="1180" y2="330"/>
+      </g>
+      <g stroke="#111110" stroke-width="2.5">
+        <rect x="912" y="80" width="22" height="60" fill="#E2001A"/>
+        <rect x="938" y="76" width="22" height="64" fill="#FAF4E8"/>
+        <rect x="964" y="80" width="20" height="60" fill="#A3B644"/>
+        <rect x="988" y="74" width="24" height="66" fill="#2C7BCF"/>
+        <rect x="1016" y="80" width="22" height="60" fill="#F5D67A"/>
+        <rect x="1042" y="78" width="22" height="62" fill="#E2001A"/>
+        <rect x="1068" y="80" width="22" height="60" fill="#FAF4E8"/>
+        <rect x="1094" y="80" width="22" height="60" fill="#2C7BCF"/>
+        <rect x="1120" y="80" width="22" height="60" fill="#A3B644"/>
+        <rect x="1146" y="80" width="22" height="60" fill="#E2001A"/>
+        <!-- row 2 -->
+        <rect x="912" y="170" width="22" height="60" fill="#FAF4E8"/>
+        <rect x="938" y="170" width="22" height="60" fill="#2C7BCF"/>
+        <rect x="964" y="166" width="24" height="64" fill="#E2001A"/>
+        <rect x="992" y="170" width="22" height="60" fill="#F5D67A"/>
+        <rect x="1018" y="170" width="22" height="60" fill="#A3B644"/>
+        <!-- shelf items -->
+        <rect x="1050" y="170" width="60" height="60" fill="#fff"/>
+        <line x1="1052" y1="195" x2="1108" y2="195"/>
+        <rect x="1114" y="184" width="26" height="46" fill="#E2001A"/>
+        <rect x="1144" y="178" width="26" height="52" fill="#2C7BCF"/>
+        <!-- row 3 plant -->
+        <rect x="1010" y="266" width="80" height="56" fill="#A87044"/>
+        <path d="M 1050 270 Q 1050 200 1100 220 Q 1100 250 1050 266" fill="#A3B644" stroke="#111110" stroke-width="3"/>
+        <path d="M 1050 270 Q 1050 220 1010 230 Q 1000 250 1050 268" fill="#7D8E2F" stroke="#111110" stroke-width="3"/>
+      </g>
+      <!-- desk -->
+      <rect x="0" y="500" width="1280" height="220" fill="#C49B6F" stroke="#111110" stroke-width="5"/>
+      <line x1="0" y1="560" x2="1280" y2="560" stroke="#111110" stroke-width="2" opacity=".3"/>
+      <line x1="0" y1="640" x2="1280" y2="640" stroke="#111110" stroke-width="2" opacity=".3"/>
+      <!-- laptop -->
+      <g transform="translate(580, 470)">
+        <path d="M 0 70 L 140 70 L 130 0 L 10 0 Z" fill="#1E1E1D" stroke="#111110" stroke-width="4"/>
+        <rect x="14" y="6" width="112" height="56" fill="#2C7BCF" stroke="#111110" stroke-width="2"/>
+        <rect x="-10" y="68" width="160" height="10" fill="#111110"/>
+        <text x="70" y="42" text-anchor="middle" fill="#fff" font-family="Inter" font-weight="800" font-size="14">AI</text>
+      </g>
+      <!-- coffee mug -->
+      <g transform="translate(750, 510)">
+        <ellipse cx="22" cy="6" rx="22" ry="4" fill="#fff" stroke="#111110" stroke-width="3"/>
+        <path d="M 0 6 L 4 50 Q 4 60 14 62 L 30 62 Q 40 60 40 50 L 44 6 Z" fill="#E2001A" stroke="#111110" stroke-width="3"/>
+      </g>
+    </svg>`,
+
+  bgStudio: () => `
+    <svg viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <rect width="1280" height="720" fill="#FAF4E8"/>
+      <!-- big bookshelves -->
+      <g fill="#A87044" stroke="#111110" stroke-width="5">
+        <rect x="30" y="50" width="380" height="430"/>
+      </g>
+      <g stroke="#111110" stroke-width="3">
+        <line x1="30" y1="140" x2="410" y2="140"/>
+        <line x1="30" y1="230" x2="410" y2="230"/>
+        <line x1="30" y1="320" x2="410" y2="320"/>
+        <line x1="30" y1="410" x2="410" y2="410"/>
+      </g>
+      <!-- books rows -->
+      <g stroke="#111110" stroke-width="2.5">
+        <rect x="44" y="70" width="22" height="60" fill="#E2001A"/>
+        <rect x="70" y="66" width="22" height="64" fill="#2C7BCF"/>
+        <rect x="96" y="70" width="22" height="60" fill="#FAF4E8"/>
+        <rect x="122" y="64" width="24" height="66" fill="#A3B644"/>
+        <rect x="150" y="70" width="22" height="60" fill="#F5D67A"/>
+        <rect x="176" y="68" width="22" height="62" fill="#E2001A"/>
+        <rect x="202" y="70" width="22" height="60" fill="#2C7BCF"/>
+        <rect x="228" y="64" width="24" height="66" fill="#FAF4E8"/>
+        <rect x="256" y="70" width="22" height="60" fill="#A3B644"/>
+        <rect x="282" y="66" width="22" height="64" fill="#E2001A"/>
+        <rect x="308" y="70" width="22" height="60" fill="#F5D67A"/>
+        <rect x="334" y="70" width="22" height="60" fill="#2C7BCF"/>
+        <rect x="360" y="68" width="22" height="62" fill="#A3B644"/>
+        <!-- row 2 -->
+        <rect x="44" y="160" width="22" height="60" fill="#FAF4E8"/>
+        <rect x="70" y="160" width="22" height="60" fill="#E2001A"/>
+        <rect x="96" y="156" width="24" height="64" fill="#A3B644"/>
+        <rect x="124" y="160" width="22" height="60" fill="#2C7BCF"/>
+        <rect x="150" y="160" width="22" height="60" fill="#F5D67A"/>
+        <rect x="176" y="158" width="22" height="62" fill="#FAF4E8"/>
+        <rect x="202" y="160" width="22" height="60" fill="#E2001A"/>
+        <rect x="228" y="160" width="22" height="60" fill="#2C7BCF"/>
+        <rect x="254" y="156" width="24" height="64" fill="#A3B644"/>
+        <rect x="282" y="160" width="22" height="60" fill="#FAF4E8"/>
+        <rect x="308" y="160" width="22" height="60" fill="#E2001A"/>
+        <rect x="334" y="160" width="22" height="60" fill="#F5D67A"/>
+        <rect x="360" y="160" width="22" height="60" fill="#2C7BCF"/>
+        <!-- row 3 with objects -->
+        <rect x="44" y="250" width="22" height="60" fill="#A3B644"/>
+        <rect x="70" y="246" width="24" height="64" fill="#E2001A"/>
+        <rect x="98" y="250" width="22" height="60" fill="#FAF4E8"/>
+        <rect x="124" y="250" width="22" height="60" fill="#2C7BCF"/>
+        <!-- a frame -->
+        <rect x="160" y="260" width="80" height="50" fill="#FAF4E8"/>
+        <circle cx="200" cy="285" r="14" fill="#F5D67A"/>
+        <rect x="250" y="246" width="22" height="64" fill="#E2001A"/>
+        <rect x="276" y="250" width="22" height="60" fill="#A3B644"/>
+        <rect x="302" y="250" width="22" height="60" fill="#2C7BCF"/>
+        <rect x="328" y="246" width="24" height="64" fill="#FAF4E8"/>
+        <rect x="356" y="250" width="22" height="60" fill="#E2001A"/>
+        <!-- row 4 -->
+        <rect x="44" y="340" width="22" height="60" fill="#E2001A"/>
+        <rect x="70" y="340" width="22" height="60" fill="#FAF4E8"/>
+        <rect x="96" y="336" width="24" height="64" fill="#A3B644"/>
+        <rect x="124" y="340" width="22" height="60" fill="#2C7BCF"/>
+        <rect x="150" y="340" width="22" height="60" fill="#F5D67A"/>
+        <rect x="176" y="338" width="22" height="62" fill="#E2001A"/>
+        <rect x="202" y="340" width="22" height="60" fill="#A3B644"/>
+        <rect x="228" y="340" width="22" height="60" fill="#FAF4E8"/>
+        <rect x="254" y="336" width="24" height="64" fill="#2C7BCF"/>
+        <rect x="282" y="340" width="22" height="60" fill="#E2001A"/>
+        <rect x="308" y="340" width="22" height="60" fill="#F5D67A"/>
+        <rect x="334" y="340" width="22" height="60" fill="#A3B644"/>
+        <rect x="360" y="340" width="22" height="60" fill="#2C7BCF"/>
+      </g>
+      <!-- window right -->
+      <g stroke="#111110" stroke-width="5">
+        <rect x="900" y="60" width="320" height="380" fill="#C9E5F2"/>
+        <line x1="1060" y1="60" x2="1060" y2="440"/>
+        <line x1="900" y1="250" x2="1220" y2="250"/>
+      </g>
+      <!-- plant on desk -->
+      <g transform="translate(700, 380)">
+        <rect x="0" y="80" width="80" height="50" fill="#A87044" stroke="#111110" stroke-width="4"/>
+        <path d="M 40 80 Q 40 0 80 40 Q 80 60 40 80" fill="#A3B644" stroke="#111110" stroke-width="3"/>
+        <path d="M 40 80 Q 40 10 0 30 Q 0 60 40 80" fill="#7D8E2F" stroke="#111110" stroke-width="3"/>
+        <path d="M 40 80 Q 60 10 90 20 Q 80 50 40 80" fill="#A3B644" stroke="#111110" stroke-width="3"/>
+      </g>
+      <!-- desk -->
+      <rect x="0" y="500" width="1280" height="220" fill="#A87044" stroke="#111110" stroke-width="5"/>
+      <line x1="0" y1="560" x2="1280" y2="560" stroke="#111110" stroke-width="2" opacity=".3"/>
+      <line x1="0" y1="640" x2="1280" y2="640" stroke="#111110" stroke-width="2" opacity=".3"/>
+      <!-- law book stack -->
+      <g transform="translate(880, 460)" stroke="#111110" stroke-width="3">
+        <rect x="0" y="20" width="120" height="20" fill="#E2001A"/>
+        <rect x="6" y="0" width="108" height="20" fill="#2C7BCF"/>
+        <text x="60" y="14" text-anchor="middle" fill="#fff" font-family="Inter" font-weight="800" font-size="9">CODICE CIVILE</text>
+      </g>
+    </svg>`,
+
+  // ----- CHARACTERS — Zerocalcare flat style -----
+  // Each returns a contained SVG bust ~280x420
+  charMaria: (mood='default') => {
+    const eyebrowY = mood === 'worry' ? -3 : mood === 'shock' ? -8 : 0;
+    const mouth = mood === 'shock'
+      ? '<ellipse cx="0" cy="20" rx="9" ry="11" fill="#7A1818" stroke="#111110" stroke-width="2.5"/>'
+      : mood === 'worry'
+      ? '<path d="M -16 22 Q 0 14 16 22" fill="none" stroke="#111110" stroke-width="3" stroke-linecap="round"/>'
+      : mood === 'smile'
+      ? '<path d="M -18 12 Q 0 30 18 12" fill="#7A1818" stroke="#111110" stroke-width="3" stroke-linecap="round"/>'
+      : '<path d="M -14 18 Q 0 24 14 18" fill="none" stroke="#111110" stroke-width="3" stroke-linecap="round"/>';
+    return `
+    <svg width="280" height="420" viewBox="0 0 280 420" xmlns="http://www.w3.org/2000/svg">
+      <!-- body / sweater bordeaux -->
+      <path d="M 60 320 L 60 420 L 220 420 L 220 320 Q 220 280 190 264 L 90 264 Q 60 280 60 320 Z" fill="#7A1A2A" stroke="#111110" stroke-width="5"/>
+      <!-- neck -->
+      <rect x="120" y="250" width="40" height="30" fill="#E8B89A" stroke="#111110" stroke-width="4"/>
+      <!-- chain glasses on neck -->
+      <path d="M 100 268 Q 140 290 180 268" fill="none" stroke="#C49B6F" stroke-width="2" stroke-dasharray="3 3"/>
+      <g transform="translate(140, 290)">
+        <circle cx="-10" cy="0" r="7" fill="none" stroke="#111110" stroke-width="2.5"/>
+        <circle cx="10" cy="0" r="7" fill="none" stroke="#111110" stroke-width="2.5"/>
+        <line x1="-3" y1="0" x2="3" y2="0" stroke="#111110" stroke-width="2"/>
+      </g>
+      <!-- back hair / low bun behind head -->
+      <ellipse cx="140" cy="245" rx="56" ry="18" fill="#5C3819" stroke="#111110" stroke-width="4"/>
+      <!-- side hair strands falling along the cheeks -->
+      <path d="M 70 180 Q 60 230 78 256 L 88 244 Q 76 220 86 180 Z" fill="#5C3819" stroke="#111110" stroke-width="4"/>
+      <path d="M 210 180 Q 220 230 202 256 L 192 244 Q 204 220 194 180 Z" fill="#5C3819" stroke="#111110" stroke-width="4"/>
+      <!-- head -->
+      <ellipse cx="140" cy="170" rx="78" ry="92" fill="#E8B89A" stroke="#111110" stroke-width="5"/>
+      <!-- top hair: voluminous shape with side parting, leaves part of forehead visible -->
+      <path d="M 62 170
+               Q 56 86 140 78
+               Q 224 86 218 170
+               Q 214 142 192 124
+               Q 172 110 160 115
+               Q 150 100 134 108
+               Q 122 100 110 116
+               Q 98 110 84 124
+               Q 66 142 62 170 Z"
+            fill="#5C3819" stroke="#111110" stroke-width="5"/>
+      <!-- side parting line -->
+      <path d="M 134 108 Q 130 130 116 158" stroke="#3D2410" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <!-- grey strands -->
+      <path d="M 92 132 Q 100 162 94 198" stroke="#C5C2B8" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M 188 132 Q 180 162 186 198" stroke="#C5C2B8" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M 110 116 Q 116 138 110 168" stroke="#C5C2B8" stroke-width="2.5" fill="none" stroke-linecap="round" opacity=".7"/>
+      <!-- eyes -->
+      <g transform="translate(140, 178)">
+        <ellipse cx="-28" cy="0" rx="9" ry="7" fill="#fff" stroke="#111110" stroke-width="3"/>
+        <ellipse cx="28" cy="0" rx="9" ry="7" fill="#fff" stroke="#111110" stroke-width="3"/>
+        <circle cx="-28" cy="0" r="3.5" fill="#111110"/>
+        <circle cx="28" cy="0" r="3.5" fill="#111110"/>
+        <!-- eyebrows -->
+        <path d="M -40 ${-14+eyebrowY} L -16 ${-12+eyebrowY}" stroke="#3D2410" stroke-width="4" stroke-linecap="round"/>
+        <path d="M 16 ${-12+eyebrowY} L 40 ${-14+eyebrowY}" stroke="#3D2410" stroke-width="4" stroke-linecap="round"/>
+        <!-- under-eye fatigue -->
+        <path d="M -36 6 Q -28 10 -20 6" stroke="#A8826A" stroke-width="2" fill="none"/>
+        <path d="M 20 6 Q 28 10 36 6" stroke="#A8826A" stroke-width="2" fill="none"/>
+      </g>
+      <!-- nose -->
+      <path d="M 140 184 L 134 204 Q 134 210 140 210 L 146 210 Q 146 204 140 204" fill="none" stroke="#111110" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- mouth -->
+      <g transform="translate(140, 220)">${mouth}</g>
+      <!-- earrings -->
+      <circle cx="66" cy="194" r="4" fill="#F5D67A" stroke="#111110" stroke-width="2"/>
+      <circle cx="214" cy="194" r="4" fill="#F5D67A" stroke="#111110" stroke-width="2"/>
+    </svg>`;
+  },
+
+  charCarlo: (mood='default') => {
+    const mouth = mood === 'smile'
+      ? '<path d="M -18 12 Q 0 30 18 12" fill="#7A1818" stroke="#111110" stroke-width="3" stroke-linecap="round"/>'
+      : mood === 'talk'
+      ? '<ellipse cx="0" cy="18" rx="8" ry="6" fill="#7A1818" stroke="#111110" stroke-width="2.5"/>'
+      : '<path d="M -16 16 Q 0 22 16 16" fill="none" stroke="#111110" stroke-width="3" stroke-linecap="round"/>';
+    const armPose = mood === 'talk'
+      ? '<path d="M 60 350 L 30 320 L 36 280" fill="none" stroke="#111110" stroke-width="5" stroke-linecap="round"/>'
+      : '';
+    return `
+    <svg width="280" height="420" viewBox="0 0 280 420" xmlns="http://www.w3.org/2000/svg">
+      <!-- t-shirt blue -->
+      <path d="M 50 320 L 50 420 L 230 420 L 230 320 Q 230 280 200 268 L 80 268 Q 50 280 50 320 Z" fill="#1A3D6E" stroke="#111110" stroke-width="5"/>
+      <!-- zip hoodie gray over -->
+      <path d="M 50 320 L 50 420 L 100 420 L 100 280 L 80 268 Q 50 280 50 320 Z" fill="#9A9A98" stroke="#111110" stroke-width="5"/>
+      <path d="M 230 320 L 230 420 L 180 420 L 180 280 L 200 268 Q 230 280 230 320 Z" fill="#9A9A98" stroke="#111110" stroke-width="5"/>
+      <!-- zip line -->
+      <line x1="140" y1="270" x2="140" y2="420" stroke="#111110" stroke-width="2.5" stroke-dasharray="6 3"/>
+      ${armPose}
+      <!-- neck -->
+      <rect x="120" y="250" width="40" height="32" fill="#D4A88C" stroke="#111110" stroke-width="4"/>
+      <!-- head -->
+      <ellipse cx="140" cy="172" rx="76" ry="88" fill="#D4A88C" stroke="#111110" stroke-width="5"/>
+      <!-- hair messy dark -->
+      <path d="M 64 170 Q 50 70 140 64 Q 230 70 216 170 Q 210 130 188 110 Q 180 90 150 88 Q 130 116 100 96 Q 76 110 70 140 Z"
+            fill="#2D1B0E" stroke="#111110" stroke-width="5"/>
+      <!-- curl strand -->
+      <path d="M 110 86 Q 108 70 124 76" fill="none" stroke="#2D1B0E" stroke-width="6" stroke-linecap="round"/>
+      <path d="M 168 84 Q 174 68 156 76" fill="none" stroke="#2D1B0E" stroke-width="6" stroke-linecap="round"/>
+      <!-- round glasses (intellectual) -->
+      <g transform="translate(140, 175)">
+        <circle cx="-26" cy="0" r="18" fill="#FAF4E8" fill-opacity=".3" stroke="#111110" stroke-width="4"/>
+        <circle cx="26" cy="0" r="18" fill="#FAF4E8" fill-opacity=".3" stroke="#111110" stroke-width="4"/>
+        <line x1="-8" y1="0" x2="8" y2="0" stroke="#111110" stroke-width="3"/>
+        <!-- pupils -->
+        <circle cx="-26" cy="0" r="3.5" fill="#111110"/>
+        <circle cx="26" cy="0" r="3.5" fill="#111110"/>
+        <!-- eyebrows above glasses -->
+        <path d="M -44 -22 L -10 -22" stroke="#2D1B0E" stroke-width="4" stroke-linecap="round"/>
+        <path d="M 10 -22 L 44 -22" stroke="#2D1B0E" stroke-width="4" stroke-linecap="round"/>
+      </g>
+      <!-- nose -->
+      <path d="M 140 180 L 136 200 Q 136 207 140 207 L 144 207 Q 144 200 140 200" fill="none" stroke="#111110" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- beard stubble -->
+      <g opacity=".5">
+        <circle cx="100" cy="220" r="1.5" fill="#2D1B0E"/>
+        <circle cx="110" cy="226" r="1.5" fill="#2D1B0E"/>
+        <circle cx="120" cy="230" r="1.5" fill="#2D1B0E"/>
+        <circle cx="170" cy="226" r="1.5" fill="#2D1B0E"/>
+        <circle cx="180" cy="222" r="1.5" fill="#2D1B0E"/>
+        <circle cx="116" cy="240" r="1.5" fill="#2D1B0E"/>
+        <circle cx="160" cy="240" r="1.5" fill="#2D1B0E"/>
+      </g>
+      <!-- mouth -->
+      <g transform="translate(140, 215)">${mouth}</g>
+    </svg>`;
+  },
+
+  charMarta: (mood='default') => {
+    const mouth = mood === 'smile'
+      ? '<path d="M -16 12 Q 0 26 16 12" fill="#9A2C3A" stroke="#111110" stroke-width="3" stroke-linecap="round"/>'
+      : mood === 'serious'
+      ? '<line x1="-14" y1="18" x2="14" y2="18" stroke="#111110" stroke-width="3" stroke-linecap="round"/>'
+      : '<path d="M -14 16 Q 0 22 14 16" fill="none" stroke="#111110" stroke-width="3" stroke-linecap="round"/>';
+    return `
+    <svg width="280" height="420" viewBox="0 0 280 420" xmlns="http://www.w3.org/2000/svg">
+      <!-- blazer salvia -->
+      <path d="M 40 320 L 40 420 L 240 420 L 240 320 Q 240 280 210 264 L 70 264 Q 40 280 40 320 Z" fill="#A3B695" stroke="#111110" stroke-width="5"/>
+      <!-- blouse cream V-neck -->
+      <path d="M 110 264 L 140 320 L 170 264 L 165 280 L 175 300 L 140 350 L 105 300 L 115 280 Z" fill="#F5E9CC" stroke="#111110" stroke-width="4"/>
+      <!-- lapels -->
+      <path d="M 70 270 L 110 264 L 140 320 L 100 290 Z" fill="#7D8E2F" stroke="#111110" stroke-width="4"/>
+      <path d="M 210 270 L 170 264 L 140 320 L 180 290 Z" fill="#7D8E2F" stroke="#111110" stroke-width="4"/>
+      <!-- neck -->
+      <rect x="120" y="250" width="40" height="28" fill="#E0BC9C" stroke="#111110" stroke-width="4"/>
+      <!-- thin necklace -->
+      <path d="M 122 268 Q 140 280 158 268" fill="none" stroke="#F5D67A" stroke-width="2"/>
+      <!-- head -->
+      <ellipse cx="140" cy="172" rx="74" ry="86" fill="#E0BC9C" stroke="#111110" stroke-width="5"/>
+      <!-- hair coppery long -->
+      <path d="M 66 170 Q 60 80 140 76 Q 220 80 214 170 L 220 230 Q 230 254 220 260 L 196 245 Q 200 200 200 170 L 180 130 Q 140 100 100 130 L 80 170 Q 80 200 84 245 L 60 260 Q 50 254 60 230 Z"
+            fill="#9C5424" stroke="#111110" stroke-width="5"/>
+      <!-- side parting -->
+      <path d="M 140 76 Q 126 100 110 130" stroke="#6F3818" stroke-width="3" fill="none"/>
+      <!-- ponytail back -->
+      <path d="M 140 250 Q 168 320 158 360 Q 152 380 144 380" fill="#9C5424" stroke="#111110" stroke-width="5"/>
+      <!-- eyes -->
+      <g transform="translate(140, 175)">
+        <ellipse cx="-26" cy="0" rx="9" ry="7" fill="#fff" stroke="#111110" stroke-width="3"/>
+        <ellipse cx="26" cy="0" rx="9" ry="7" fill="#fff" stroke="#111110" stroke-width="3"/>
+        <circle cx="-26" cy="1" r="4" fill="#5C8A2A"/>
+        <circle cx="26" cy="1" r="4" fill="#5C8A2A"/>
+        <circle cx="-26" cy="0" r="2" fill="#111110"/>
+        <circle cx="26" cy="0" r="2" fill="#111110"/>
+        <!-- eyebrows -->
+        <path d="M -40 -14 Q -32 -16 -16 -14" stroke="#6F3818" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+        <path d="M 16 -14 Q 32 -16 40 -14" stroke="#6F3818" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+        <!-- freckles -->
+        <circle cx="-12" cy="14" r="1" fill="#A57050"/>
+        <circle cx="-4" cy="16" r="1" fill="#A57050"/>
+        <circle cx="6" cy="14" r="1" fill="#A57050"/>
+        <circle cx="14" cy="18" r="1" fill="#A57050"/>
+      </g>
+      <!-- nose -->
+      <path d="M 140 180 L 135 200 Q 135 208 140 208 L 145 208 Q 145 200 140 200" fill="none" stroke="#111110" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- mouth -->
+      <g transform="translate(140, 215)">${mouth}</g>
+      <!-- earrings -->
+      <circle cx="64" cy="184" r="3" fill="#F5D67A" stroke="#111110" stroke-width="2"/>
+      <circle cx="216" cy="184" r="3" fill="#F5D67A" stroke="#111110" stroke-width="2"/>
+    </svg>`;
+  },
+
+  // ----- THOUGHT BUBBLE -----
+  thoughtBubble: (text) => `
+    <div style="position:absolute;top:120px;right:80px;max-width:380px;
+                background:#fff;border:5px solid #111110;border-radius:24px;
+                padding:18px 22px;box-shadow:0 6px 0 #111110;font-family:'Caveat',cursive;
+                font-size:26px;line-height:1.2;color:#1E1E1D;transform:rotate(-2deg);z-index:4">
+      ${text}
+      <div style="position:absolute;bottom:-30px;left:50px;width:30px;height:30px;
+                  border:5px solid #111110;background:#fff;border-radius:50%"></div>
+      <div style="position:absolute;bottom:-50px;left:30px;width:18px;height:18px;
+                  border:4px solid #111110;background:#fff;border-radius:50%"></div>
+    </div>`,
+};
+
+/* ============================================================
+   GAME STATE
+============================================================ */
+const state = {
+  scene: 'intro_1',
+  privacy: 0,
+  knowledge: 0,
+  flags: { aiTried: false, censored: 0, totalSensitive: 5 },
+};
+
+/* ============================================================
+   SCENE DEFINITIONS
+   Each scene: { bg, char(s), text, speaker, choices?, next }
+============================================================ */
+const scenes = {
+  // ---------- ACT 1: COOP & SHOCK ----------
+  intro_1: {
+    bg: 'Coop',
+    chars: [{ name: 'Maria', mood: 'default', pos: 'center' }],
+    speaker: 'Maria',
+    text: '<span class="quote">"Stesso giro, stessi scaffali. Sono socia da diciotto anni, la conosco a memoria, questa Coop."</span>',
+    next: 'intro_2',
+  },
+  intro_2: {
+    bg: 'Coop',
+    chars: [{ name: 'Maria', mood: 'default', pos: 'center' }],
+    speaker: 'Maria',
+    text: 'Dopo otto ore in corsia, fare la spesa è la mia <em>terapia</em>. Niente camici, niente flebo, niente bip-bip.',
+    next: 'phone_buzz',
+  },
+  phone_buzz: {
+    bg: 'Coop',
+    chars: [{ name: 'Maria', mood: 'worry', pos: 'center' }],
+    thought: 'Bzzz... una mail dell\'amministratore?',
+    speaker: 'Narratore',
+    speakerStyle: 'dark',
+    text: 'Tra la pasta e il detersivo, il telefono vibra. È una mail dell\'amministratore di condominio.',
+    next: 'read_letter',
+  },
+  read_letter: {
+    bg: 'Coop',
+    chars: [{ name: 'Maria', mood: 'shock', pos: 'center' }],
+    thought: '"Articolo 2051... diffida formale... quindici giorni... rispondere..."',
+    speaker: 'Maria',
+    text: 'Capisco solo «<em>acqua</em>» e «<em>appartamento</em>». Il resto è in <em>arabo legale</em>. Quindici giorni per rispondere. <em>Quindici!</em>',
+    next: 'home_arrival',
+  },
+
+  // ---------- ACT 2: HOME, THE CHOICE ----------
+  home_arrival: {
+    bg: 'Kitchen',
+    chars: [{ name: 'Maria', mood: 'worry', pos: 'center' }],
+    speaker: 'Maria',
+    text: 'Casa. Tavolo. Lettera. Calcolatrice. Quaderno. Io. <em>Cosa faccio adesso?</em>',
+    choices: [
+      { label: 'Chiamo subito un avvocato.', icon: '⚖️', next: 'avv_branch', priv: 0, know: 0 },
+      { label: 'Mio figlio mi ha detto: «usa l\'AI». Provo.', icon: '🤖', next: 'try_ai', priv: 0, know: 1 },
+      { label: 'Lascio perdere. Tanto sono fissati con \'ste lettere.', icon: '🫥', next: 'ignore_branch', priv: 0, know: -1 },
+    ],
+  },
+  avv_branch: {
+    bg: 'Kitchen',
+    chars: [{ name: 'Maria', mood: 'worry', pos: 'center' }],
+    speaker: 'Maria',
+    text: 'L\'avvocato mi chiede <em>180 euro</em> solo per leggere la lettera. <em>Centottanta</em>. Per leggere.',
+    next: 'avv_branch_2',
+  },
+  avv_branch_2: {
+    bg: 'Kitchen',
+    chars: [{ name: 'Maria', mood: 'default', pos: 'center' }],
+    speaker: 'Maria',
+    text: 'Riattacco. Sto un attimo. Pensa, Maria, pensa. <em>Mio figlio ha detto qualcosa sull\'intelligenza artificiale...</em>',
+    next: 'try_ai',
+  },
+  ignore_branch: {
+    bg: 'Kitchen',
+    chars: [{ name: 'Maria', mood: 'shock', pos: 'center' }],
+    speaker: 'Maria',
+    text: 'Tre giorni dopo arriva un\'altra lettera. Stavolta dall\'avvocato del vicino. <em>Cifre più grosse</em>. Mh.',
+    next: 'ignore_branch_2',
+  },
+  ignore_branch_2: {
+    bg: 'Kitchen',
+    chars: [{ name: 'Maria', mood: 'worry', pos: 'center' }],
+    speaker: 'Maria',
+    text: 'Ok, forse non era il caso di ignorare. Riprovo da capo: <em>vediamo questa intelligenza artificiale</em>.',
+    next: 'try_ai',
+  },
+
+  // ---------- ACT 3: CARLO ENTERS ----------
+  try_ai: {
+    bg: 'Kitchen',
+    chars: [{ name: 'Maria', mood: 'default', pos: 'center' }],
+    speaker: 'Narratore',
+    speakerStyle: 'dark',
+    text: 'Apri il sito del corso Coop. Compare un tipo con la felpa.',
+    next: 'meet_carlo',
+  },
+  meet_carlo: {
+    bg: 'Office',
+    chars: [{ name: 'Carlo', mood: 'smile', pos: 'right' }],
+    speaker: 'Carlo',
+    text: 'Ciao Maria. Sono Carlo. <em>Niente paura</em>: l\'intelligenza artificiale non è una cosa nuova da studiare. È uno strumento. Come il microonde.',
+    next: 'carlo_2',
+  },
+  carlo_2: {
+    bg: 'Office',
+    chars: [{ name: 'Carlo', mood: 'talk', pos: 'right' }],
+    speaker: 'Carlo',
+    text: 'Fai una foto alla lettera. La carichi nella chat dell\'AI. Le chiedi: <em>"spiegamela come la spiegheresti a tua nonna"</em>. Te la traduce in trenta secondi.',
+    next: 'carlo_3',
+  },
+  carlo_3: {
+    bg: 'Office',
+    chars: [{ name: 'Carlo', mood: 'smile', pos: 'right' }],
+    speaker: 'Carlo',
+    text: 'Prima di farti partire, però, <em>passo la parola a Marta</em>. Lei ti deve dire una cosa importante.',
+    next: 'meet_marta',
+  },
+
+  // ---------- ACT 4: MARTA & PRIVACY ----------
+  meet_marta: {
+    bg: 'Studio',
+    chars: [{ name: 'Marta', mood: 'default', pos: 'left' }],
+    speaker: 'Marta',
+    text: 'Ciao Maria. Sono Marta. Faccio l\'avvocata, mi occupo di privacy. <em>Una cosa sola</em>, prima che carichi quella lettera.',
+    next: 'marta_2',
+  },
+  marta_2: {
+    bg: 'Studio',
+    chars: [{ name: 'Marta', mood: 'serious', pos: 'left' }],
+    speaker: 'Marta',
+    text: '<em>Non dare all\'AI i dati che non daresti a uno sconosciuto in autobus.</em> Nome, indirizzo, codice fiscale, numero del vicino. Quelli no.',
+    next: 'marta_3',
+  },
+  marta_3: {
+    bg: 'Studio',
+    chars: [{ name: 'Marta', mood: 'smile', pos: 'left' }],
+    speaker: 'Marta',
+    text: 'Ti faccio vedere io. Hai sessanta secondi: <em>oscura i dati sensibili sulla lettera</em>. Poi possiamo caricarla.',
+    choices: [
+      { label: 'Va bene, ci provo. (Inizia la mini-sfida)', icon: '🖊️', next: '__minigame', priv: 0, know: 0 },
+    ],
+  },
+
+  // ---------- ACT 6: AFTER MINI-GAME (resolved in code) ----------
+  result_good: {
+    bg: 'Studio',
+    chars: [{ name: 'Marta', mood: 'smile', pos: 'left' }],
+    speaker: 'Marta',
+    text: 'Perfetto! Hai oscurato <em>tutti i dati personali</em>. Ora puoi caricare la lettera con la mente serena.',
+    next: 'ai_explains',
+  },
+  result_partial: {
+    bg: 'Studio',
+    chars: [{ name: 'Marta', mood: 'serious', pos: 'left' }],
+    speaker: 'Marta',
+    text: 'Hai oscurato qualcosa, ma <em>non tutto</em>. Nome, indirizzo, codice fiscale: non si scherza. Ti faccio rifare? (puoi anche andare avanti, ma il tuo punteggio privacy ne risente)',
+    next: 'ai_explains',
+  },
+  result_bad: {
+    bg: 'Studio',
+    chars: [{ name: 'Marta', mood: 'serious', pos: 'left' }],
+    speaker: 'Marta',
+    text: '<em>Maria!</em> Hai caricato tutto in chiaro. Codice fiscale, indirizzo, nome del vicino. Adesso quei dati sono nei server di un\'azienda americana. <em>Non doveva andare così.</em>',
+    next: 'ai_explains',
+  },
+
+  ai_explains: {
+    bg: 'Kitchen',
+    chars: [{ name: 'Maria', mood: 'default', pos: 'center' }],
+    speaker: 'Narratore',
+    speakerStyle: 'dark',
+    text: 'L\'AI legge la lettera. <em>Trenta secondi.</em> Compare la spiegazione.',
+    next: 'ai_explains_2',
+  },
+  ai_explains_2: {
+    bg: 'Kitchen',
+    chars: [{ name: 'Maria', mood: 'smile', pos: 'center' }],
+    speaker: 'Maria (legge)',
+    text: '<span class="quote">"Questa lettera è una diffida formale. Il condominio ti accusa di una perdita d\'acqua. Hai 15 giorni. Cosa fare: 1) chiama un idraulico, 2) rispondi per iscritto entro i termini."</span>',
+    next: 'maria_amazed',
+  },
+  maria_amazed: {
+    bg: 'Kitchen',
+    chars: [{ name: 'Maria', mood: 'smile', pos: 'center' }],
+    speaker: 'Maria',
+    text: 'Ma dai. <em>L\'ha capita meglio del geometra del condominio.</em> E me l\'ha spiegata in italiano. <em>Italiano vero.</em>',
+    next: 'choice_response',
+  },
+
+  choice_response: {
+    bg: 'Kitchen',
+    chars: [{ name: 'Maria', mood: 'default', pos: 'center' }],
+    speaker: 'Maria',
+    text: 'Adesso devo rispondere. <em>Cosa faccio?</em>',
+    choices: [
+      { label: 'Chiedo all\'AI di scrivermi una bozza di risposta.', icon: '✉️', next: 'response_ai', priv: 0, know: 1 },
+      { label: 'La scrivo io. Tanto la voce è la mia.', icon: '✍️', next: 'response_me', priv: 1, know: 0 },
+      { label: 'Chiamo davvero l\'avvocato per la risposta.', icon: '⚖️', next: 'response_lawyer', priv: 1, know: 0 },
+    ],
+  },
+  response_ai: {
+    bg: 'Kitchen',
+    chars: [{ name: 'Maria', mood: 'smile', pos: 'center' }],
+    speaker: 'Maria',
+    text: 'L\'AI mi scrive una bozza formale. <em>Io la rileggo, cambio due cose, ci metto il mio nome.</em> Cinque minuti. Cinque.',
+    next: 'ending_check',
+  },
+  response_me: {
+    bg: 'Kitchen',
+    chars: [{ name: 'Maria', mood: 'smile', pos: 'center' }],
+    speaker: 'Maria',
+    text: 'Adesso che ho capito di cosa parla, scriverla è facile. <em>Lo strumento serve a capire, mica a sostituirti.</em>',
+    next: 'ending_check',
+  },
+  response_lawyer: {
+    bg: 'Kitchen',
+    chars: [{ name: 'Maria', mood: 'default', pos: 'center' }],
+    speaker: 'Maria',
+    text: 'Lo chiamo. Ma adesso so cosa dirgli. E quanto dovrebbe costare. <em>Marta sarebbe fiera di me.</em>',
+    next: 'ending_check',
+  },
+
+  // ending_check resolved in code
+
+};
+
+/* ============================================================
+   RENDERER
+============================================================ */
+const $ = (id) => document.getElementById(id);
+
+function showScreen(id){
+  ['title-screen','scene-screen','mini-screen','end-screen'].forEach(s => {
+    const el = $(s);
+    el.classList.toggle('active', s === id);
+  });
+  // Flash transition
+  const flash = document.createElement('div');
+  flash.className = 'flash';
+  $('root').appendChild(flash);
+  setTimeout(() => flash.remove(), 400);
+}
+
+function updateHUD(){
+  $('hud-p').textContent = state.privacy;
+  $('hud-k').textContent = state.knowledge;
+}
+
+function renderScene(){
+  const s = scenes[state.scene];
+  if (!s) {
+    console.error('Scene not found:', state.scene);
+    return;
+  }
+  // Background
+  $('bg-layer').innerHTML = SVG['bg' + s.bg]();
+  // Characters
+  $('char-layer').innerHTML = '';
+  (s.chars || []).forEach(c => {
+    const cont = document.createElement('div');
+    cont.className = 'character ' + c.pos;
+    cont.innerHTML = SVG['char' + c.name](c.mood);
+    $('char-layer').appendChild(cont);
+  });
+  // Thought bubble
+  $('prop-layer').innerHTML = s.thought ? SVG.thoughtBubble(s.thought) : '';
+  // Dialog
+  const speakerCls = s.speakerStyle ? ' ' + s.speakerStyle : '';
+  const isChoiceScene = !!s.choices;
+  $('dialog-host').innerHTML = `
+    <div class="dialog-box" ${!isChoiceScene ? 'onclick="next()" style="cursor:pointer"' : ''}>
+      <div class="dialog-speaker${speakerCls}">${s.speaker || ''}</div>
+      <div class="dialog-text">${s.text || ''}</div>
+      ${!isChoiceScene ? '<div class="dialog-next">tocca per continuare →</div>' : ''}
+    </div>`;
+  // Choices
+  if (isChoiceScene) {
+    $('choices-host').innerHTML = s.choices.map((c, i) => `
+      <button class="choice-btn" onclick="choose(${i})">
+        <span class="num">${i+1}</span>
+        <span class="icon">${c.icon || '·'}</span>
+        <span>${c.label}</span>
+      </button>
+    `).join('');
+  } else {
+    $('choices-host').innerHTML = '';
+  }
+  updateHUD();
+}
+
+function next(){
+  const s = scenes[state.scene];
+  if (!s || !s.next) return;
+  if (s.next === '__minigame') {
+    startMiniGame();
+    return;
+  }
+  if (s.next === '__ending_check') {
+    computeEnding();
+    return;
+  }
+  state.scene = s.next;
+  renderScene();
+}
+
+function choose(i){
+  const s = scenes[state.scene];
+  if (!s || !s.choices) return;
+  const c = s.choices[i];
+  state.privacy += c.priv || 0;
+  state.knowledge += c.know || 0;
+  if (c.next === '__minigame') {
+    startMiniGame();
+    return;
+  }
+  if (c.next === 'ending_check') {
+    computeEnding();
+    return;
+  }
+  state.scene = c.next;
+  renderScene();
+}
+
+/* ============================================================
+   MINI-GAME — censor sensitive data
+============================================================ */
+function startMiniGame(){
+  showScreen('mini-screen');
+  state.flags.censored = 0;
+  // Reset letter state
+  document.querySelectorAll('#letter-body .sens').forEach(el => {
+    el.classList.remove('censored');
+    el.onclick = () => {
+      if (!el.classList.contains('censored')){
+        el.classList.add('censored');
+        state.flags.censored++;
+        $('mini-count').textContent = state.flags.censored + '/' + state.flags.totalSensitive;
+      }
+    };
+  });
+  $('mini-count').textContent = '0/' + state.flags.totalSensitive;
+}
+
+function uploadLetter(){
+  // Result depends on censored count
+  const c = state.flags.censored;
+  const total = state.flags.totalSensitive;
+  if (c >= total) {
+    state.privacy += 3;
+    state.knowledge += 1;
+    state.scene = 'result_good';
+  } else if (c >= 3) {
+    state.privacy += 1;
+    state.knowledge += 1;
+    state.scene = 'result_partial';
+  } else {
+    state.privacy -= 2;
+    state.knowledge += 1;
+    state.scene = 'result_bad';
+  }
+  showScreen('scene-screen');
+  renderScene();
+}
+
+/* ============================================================
+   ENDING LOGIC
+============================================================ */
+function computeEnding(){
+  // ending depends on combined score
+  const p = state.privacy;
+  const k = state.knowledge;
+  let kind, title, body;
+  if (p >= 3 && k >= 2){
+    kind = 'good';
+    title = 'Maria, <em>una settimana dopo</em>.';
+    body = 'Hai capito la lettera, hai risposto entro i 15 giorni, e l\'idraulico ha sistemato il tubo. Non hai dato in pasto i tuoi dati a nessuno. Hai imparato uno strumento che userai per cento altre cose.';
+  } else if (p >= 1 && k >= 1){
+    kind = 'medium';
+    title = 'Te la sei <em>cavata.</em>';
+    body = 'Hai risolto il problema della lettera, ma qualche dato in giro l\'hai lasciato. La prossima volta sai cosa migliorare: oscurare PRIMA, caricare DOPO.';
+  } else {
+    kind = 'bad';
+    title = 'Hai esposto Maria.';
+    body = 'La lettera l\'hai capita, ma codice fiscale, indirizzo e nome del vicino sono finiti sui server di un\'azienda americana. Marta è arrabbiata. Tu pure, in fondo.';
+  }
+  const end = $('end-screen');
+  end.className = 'layer ' + kind;
+  $('end-title').innerHTML = title;
+  $('end-body').innerHTML = body;
+  $('stat-p').textContent = p;
+  $('stat-k').textContent = k;
+  showScreen('end-screen');
+}
+
+// hook: when "ending_check" requested, run computeEnding
+scenes.response_ai.next = 'ending_check';
+scenes.response_me.next = 'ending_check';
+scenes.response_lawyer.next = 'ending_check';
+// Override 'next' to detect ending_check
+const origNext = next;
+window.next = function(){
+  const s = scenes[state.scene];
+  if (s && s.next === 'ending_check'){
+    computeEnding();
+    return;
+  }
+  origNext();
+};
+
+/* ============================================================
+   ENTRY POINTS
+============================================================ */
+function start(){
+  state.scene = 'intro_1';
+  state.privacy = 0;
+  state.knowledge = 0;
+  state.flags.censored = 0;
+  showScreen('scene-screen');
+  renderScene();
+}
+
+function restart(){
+  start();
+}
+
+/* ============================================================
+   KEYBOARD: space/enter to advance, 1-4 for choices
+============================================================ */
+window.addEventListener('keydown', (e) => {
+  // only when scene screen active
+  if (!$('scene-screen').classList.contains('active')) return;
+  const s = scenes[state.scene];
+  if (!s) return;
+  if (e.key === ' ' || e.key === 'Enter') {
+    if (!s.choices) next();
+  }
+  if (/^[1-4]$/.test(e.key) && s.choices) {
+    const idx = parseInt(e.key) - 1;
+    if (idx < s.choices.length) choose(idx);
+  }
+});
+
+// Show title on load
+window.addEventListener('DOMContentLoaded', () => {
+  showScreen('title-screen');
+});
+</script>
+</body>
+</html>
