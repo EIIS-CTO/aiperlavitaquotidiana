@@ -261,7 +261,7 @@ body{font-family:var(--font);color:var(--g800);background:var(--white);-webkit-f
 
 /* ── WHO ── */
 .who{background:var(--g50)}
-.who-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:48px}
+.who-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:48px}
 .who-card{
   background:var(--white);border:1px solid var(--g200);border-radius:20px;
   overflow:hidden;transition:.25s;
@@ -427,7 +427,8 @@ footer{
   .sec-title{font-size:clamp(24px,6vw,36px);line-height:1.15}
   .sec-sub{font-size:15px}
 
-  .why-grid,.who-grid{grid-template-columns:1fr;gap:14px;margin-top:36px}
+  .why-grid{grid-template-columns:1fr;gap:14px;margin-top:36px}
+  .who-grid{grid-template-columns:repeat(2,1fr);gap:14px;margin-top:36px}
   .why-card{padding:24px}
   .why-icon{font-size:30px;margin-bottom:14px}
   .why-card h3{font-size:17px}
@@ -496,6 +497,7 @@ footer{
   .mod-body{padding:22px 20px}
   .mod-img{height:180px}
   .community-content{padding:40px 20px}
+  .who-grid{grid-template-columns:1fr;gap:14px}
   .who-card{border-radius:16px}
   .who-img{height:180px}
 
@@ -641,7 +643,7 @@ footer{
 
       <div class="mod-card">
         <div class="mod-img">
-          <img src="imgs/persona_maria.png" alt="Maria, l'infermiera che fotografa una lettera burocratica">
+          <img src="imgs/persona_maria.png" alt="Maria, infermiera 52 anni">
           <div class="mod-num">1</div>
         </div>
         <div class="mod-body">
@@ -653,7 +655,7 @@ footer{
 
       <div class="mod-card">
         <div class="mod-img">
-          <img src="imgs/mod3_cucina.png" alt="Modulo 2">
+          <img src="imgs/persona_paola.png" alt="Paola, in cucina con i prodotti freschi">
           <div class="mod-num">2</div>
         </div>
         <div class="mod-body">
@@ -665,7 +667,7 @@ footer{
 
       <div class="mod-card">
         <div class="mod-img">
-          <img src="imgs/mod4_comunita.png" alt="Modulo 3">
+          <img src="imgs/persona_luca.png" alt="Luca, studente, alla sua scrivania">
           <div class="mod-num">3</div>
         </div>
         <div class="mod-body">
@@ -677,7 +679,7 @@ footer{
 
       <div class="mod-card">
         <div class="mod-img">
-          <img src="imgs/persona_giuseppe.png" alt="Giuseppe, riconosce le truffe online e si difende dal phishing">
+          <img src="imgs/persona_roberto.png" alt="Roberto, 70 anni, lettore attento e cittadino informato">
           <div class="mod-num">4</div>
         </div>
         <div class="mod-body">
@@ -809,25 +811,33 @@ footer{
     <p class="sec-sub">Ogni modulo racconta una persona come te. Non un esperto, qualcuno che non sapeva nulla di AI e ha scoperto come usarla ogni giorno.</p>
     <div class="who-grid">
       <div class="who-card">
-        <div class="who-img"><img src="imgs/mod2_burocrazia.png" alt="Lo studente universitario"></div>
+        <div class="who-img"><img src="imgs/persona_maria.png" alt="Maria, infermiera 52 anni"></div>
         <div class="who-body">
-          <div class="who-name">Lo studente pragmatico</div>
-          <div class="who-role">Burocrazia</div>
+          <div class="who-name">Maria</div>
+          <div class="who-role">Burocrazia &amp; Budget</div>
           <div class="who-quote">"Fotografo la lettera del condominio e in 10 secondi l'AI me la spiega in italiano semplice. Non chiamo più l'avvocato per ogni cosa."</div>
         </div>
       </div>
       <div class="who-card">
-        <div class="who-img"><img src="imgs/mod3_cucina.png" alt="L'eco-chef casalingo"></div>
+        <div class="who-img"><img src="imgs/persona_paola.png" alt="Paola, in cucina con i prodotti freschi"></div>
         <div class="who-body">
-          <div class="who-name">L'eco-chef casalingo</div>
-          <div class="who-role">Cucina</div>
-          <div class="who-quote">"Mostro all'AI quello che ho in frigo e mi propone ricette con gli avanzi. Non butto più niente e mangio anche meglio."</div>
+          <div class="who-name">Paola</div>
+          <div class="who-role">Cucina &amp; Benessere</div>
+          <div class="who-quote">"Mostro all'AI quello che ho in frigo e mi propone ricette zero-waste. Non butto più niente e mangio anche meglio."</div>
         </div>
       </div>
       <div class="who-card">
-        <div class="who-img"><img src="imgs/mod5_difesa.png" alt="La giovane professionista"></div>
+        <div class="who-img"><img src="imgs/persona_luca.png" alt="Luca, studente, alla sua scrivania"></div>
         <div class="who-body">
-          <div class="who-name">Il cittadino informato</div>
+          <div class="who-name">Luca</div>
+          <div class="who-role">Eventi &amp; Creatività</div>
+          <div class="who-quote">"Verbali, locandine, post per le iniziative: l'AI mi prepara tutto. Posso dedicare più tempo alle persone, meno alla scartoffia."</div>
+        </div>
+      </div>
+      <div class="who-card">
+        <div class="who-img"><img src="imgs/persona_roberto.png" alt="Roberto, 70 anni, lettore attento"></div>
+        <div class="who-body">
+          <div class="who-name">Roberto</div>
           <div class="who-role">Sicurezza digitale</div>
           <div class="who-quote">"Mio figlio mi aveva avvisato dei deepfake ma non capivo come riconoscerli. Ora so cosa cercare, e proteggo anche mia moglie."</div>
         </div>
