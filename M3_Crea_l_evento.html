@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crea l'evento — Assignment · AI per la vita quotidiana</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#E2001A; --red-dk:#B5001A; --red-soft:#FFE3E6;
+  --olive:#A3B644; --olive-dk:#7D8E2F;
+  --ink:#1E1E1D; --black:#111110; --gray:#6B6B68; --g200:#E2E2E0; --g100:#EFEFEE; --g50:#F7F7F6;
+  --white:#fff; --blue:#1565c0; --blue-bg:#e8f1fb;
+  --ok:#1f8a3b; --ok-bg:#e9f7ee; --ok-bd:#2e7d32;
+  --no:#E2001A; --no-bg:#fdecee; --warn:#b06a00; --warn-bg:#fff6e6;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);background:var(--g50);line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:720px;margin:0 auto;padding:22px 18px 160px}
+
+.kick{display:inline-flex;align-items:center;gap:8px;background:var(--red);color:#fff;font-size:11.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:7px 14px;border-radius:999px}
+.kick::before{content:"";width:7px;height:7px;border-radius:50%;background:#fff}
+
+/* INTRO */
+#intro h1{font-size:40px;font-weight:900;letter-spacing:-.03em;line-height:1.04;margin:16px 0 8px}
+#intro h1 .ac{color:var(--red)}
+#intro .lead{font-size:16.5px;color:var(--gray);margin-bottom:20px}
+.brief{background:var(--black);color:#fff;border-radius:16px;padding:22px 24px;margin-bottom:22px}
+.brief .bt{font-size:11.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#FF6B7A;margin-bottom:8px}
+.brief p{font-size:15.5px;color:#e8e8e6}.brief b{color:#fff}
+
+.btn{font-family:inherit;font-size:16px;font-weight:800;border-radius:999px;padding:14px 30px;border:3px solid var(--black);cursor:pointer;transition:.12s;background:var(--red);color:#fff;box-shadow:0 5px 0 var(--black)}
+.btn:hover{transform:translateY(2px);box-shadow:0 3px 0 var(--black)}
+.btn:active{transform:translateY(5px);box-shadow:0 0 0 var(--black)}
+.btn.ghost{background:#fff;color:var(--ink)}
+.btn.sm{font-size:14px;padding:11px 22px;box-shadow:0 4px 0 var(--black)}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+
+/* BUILDER */
+#builder{display:none}
+.bar{height:10px;background:var(--g100);border-radius:999px;overflow:hidden;margin-bottom:6px}
+.bar>span{display:block;height:100%;background:var(--red);width:0;transition:width .35s ease}
+.barlabel{font-size:12px;font-weight:700;color:var(--gray);margin-bottom:20px}
+.step h2{display:flex;align-items:center;gap:10px;font-size:23px;font-weight:900;letter-spacing:-.02em;margin-bottom:4px}
+.step h2 .n{width:32px;height:32px;border-radius:50%;background:var(--red);color:#fff;font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step .hint{font-size:14.5px;color:var(--gray);margin:2px 0 16px 42px}
+.chips{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:6px}
+.chip{font-family:inherit;font-size:14.5px;font-weight:600;color:var(--ink);background:#fff;border:2px solid var(--g200);border-radius:999px;padding:9px 16px;cursor:pointer;transition:.12s;user-select:none}
+.chip:hover{border-color:var(--red)}
+.chip.on{background:var(--red);border-color:var(--red);color:#fff}
+.chip.trap.on{background:var(--warn);border-color:var(--warn)}
+.custom-row{display:flex;gap:8px;margin-top:12px}
+.custom-row input{flex:1;font-family:inherit;font-size:15px;padding:11px 14px;border:2px solid var(--g200);border-radius:12px;outline:none}
+.custom-row input:focus{border-color:var(--red)}
+.customchips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.cchip{display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:600;background:var(--blue-bg);color:var(--blue);border:2px solid #bcd6f5;border-radius:999px;padding:7px 10px 7px 14px}
+.cchip button{border:none;background:#bcd6f5;color:#0d3a6b;width:18px;height:18px;border-radius:50%;cursor:pointer;font-weight:900;line-height:1;font-size:12px}
+.toggle-row{display:flex;align-items:center;gap:12px;margin:4px 0 14px 0}
+.tg{position:relative;width:52px;height:30px;border-radius:999px;background:var(--g200);border:none;cursor:pointer;transition:.15s;flex-shrink:0}
+.tg::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.15s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.tg.on{background:var(--olive-dk)}.tg.on::after{left:25px}
+.tg-label{font-size:15px;font-weight:600}
+.collapse{display:none;margin-top:6px}.collapse.show{display:block}
+.titlefield{margin-top:6px}
+.titlefield label{font-size:14px;font-weight:700;display:block;margin-bottom:6px}
+.titlefield input{width:100%;font-family:inherit;font-size:15px;padding:12px 14px;border:2px solid var(--g200);border-radius:12px;outline:none}
+.titlefield input:focus{border-color:var(--red)}
+
+/* STICKY LIVE PROMPT */
+.live{position:fixed;left:0;right:0;bottom:0;z-index:20;background:linear-gradient(to top,#fff 70%,rgba(255,255,255,0));padding:14px 18px 16px}
+.live-inner{max-width:684px;margin:0 auto;background:#fff;border:2px solid var(--black);border-radius:16px;padding:14px 16px;box-shadow:0 8px 24px rgba(0,0,0,.14)}
+.live .lt{font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gray);margin-bottom:6px;display:flex;justify-content:space-between}
+.promptbox{font-size:14.5px;line-height:1.5;color:var(--ink);font-style:italic;max-height:84px;overflow:auto}
+.promptbox .ph{color:#bbb}
+.promptbox .tg-word{color:var(--warn);font-style:normal;font-weight:700}
+.nav{max-width:684px;margin:10px auto 0;display:flex;justify-content:space-between;gap:10px}
+
+/* JUDGE */
+#judge{display:none}
+.verdict{display:flex;align-items:center;gap:18px;background:#fff;border:1px solid var(--g200);border-radius:16px;padding:20px;margin-bottom:8px}
+.vbadge{width:74px;height:74px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:34px;color:#fff}
+.vbadge.good{background:var(--ok)} .vbadge.mid{background:var(--warn)} .vbadge.low{background:var(--no)}
+.verdict h2{font-size:22px;font-weight:900;letter-spacing:-.02em}
+.verdict p{font-size:14.5px;color:var(--gray)}
+.crit{background:#fff;border:1px solid var(--g200);border-radius:14px;padding:4px 18px;margin:14px 0}
+.crit .row{display:flex;gap:11px;padding:12px 0;border-bottom:1px solid var(--g100)}
+.crit .row:last-child{border-bottom:none}
+.crit .ic{width:24px;height:24px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:13px;margin-top:1px}
+.ic.ok{background:var(--ok)}.ic.warn{background:var(--warn)}.ic.no{background:var(--no)}
+.crit .ct{font-size:14.5px;font-weight:700}.crit .cd{font-size:13px;color:var(--gray)}
+.finalprompt{background:var(--black);color:#fff;border-radius:16px;padding:20px 22px;margin:16px 0}
+.finalprompt .ft{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#FF6B7A;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.finalprompt .fp{font-size:15.5px;line-height:1.55;font-style:italic;color:#f2f2f0}
+.copybtn{font-family:inherit;font-size:12.5px;font-weight:800;background:#fff;color:var(--ink);border:none;border-radius:999px;padding:7px 14px;cursor:pointer}
+.copybtn.done{background:var(--olive);color:#fff}
+.cta{background:var(--blue-bg);border-left:5px solid var(--blue);border-radius:14px;padding:18px 20px;margin:16px 0}
+.cta h3{font-size:16px;font-weight:800;color:var(--blue);margin-bottom:12px}
+.cta ol{list-style:none;counter-reset:c}
+.cta li{position:relative;padding-left:34px;margin-bottom:11px;font-size:15px;line-height:1.4}
+.cta li::before{counter-increment:c;content:counter(c);position:absolute;left:0;top:-1px;width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-weight:900;font-size:13px;display:flex;align-items:center;justify-content:center}
+.cta li b{color:var(--ink)}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.tool{font-size:12.5px;font-weight:700;background:#fff;border:2px solid #bcd6f5;color:var(--blue);border-radius:999px;padding:5px 12px}
+.judge-nav{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===== INTRO ===== -->
+  <div id="intro">
+    <div class="kick">Modulo 3 · Assignment</div>
+    <h1>Crea <span class="ac">l'evento.</span></h1>
+    <p class="lead">Costruisci, passo dopo passo, il prompt per la locandina della cena di raccolta fondi. Scegli gli ingredienti e aggiungi le tue parole chiave. Alla fine ricevi un giudizio e il prompt pronto da usare.</p>
+    <div class="brief">
+      <div class="bt">La situazione</div>
+      <p>Sabato sera il circolo organizza una <b>cena di raccolta fondi</b> per un'iniziativa solidale. Serve una locandina che inviti la gente a partecipare e donare. Tu non sei un grafico, ma sai costruire un buon prompt: <b>mettine insieme uno completo e rispettoso</b>.</p>
+    </div>
+    <button class="btn" onclick="start()">Costruiamo il prompt →</button>
+  </div>
+
+  <!-- ===== BUILDER ===== -->
+  <div id="builder">
+    <div class="bar"><span id="barFill"></span></div>
+    <div class="barlabel" id="barTxt">Passo 1 di 4</div>
+    <div id="stepHost"></div>
+  </div>
+
+  <!-- ===== JUDGE ===== -->
+  <div id="judge">
+    <div class="verdict">
+      <div class="vbadge" id="vbadge">★</div>
+      <div><h2 id="vTitle">—</h2><p id="vSub">—</p></div>
+    </div>
+    <div class="crit" id="crit"></div>
+
+    <div class="finalprompt">
+      <div class="ft"><span>Il tuo prompt</span><button class="copybtn" id="copyBtn" onclick="copyPrompt()">📋 Copia</button></div>
+      <div class="fp" id="finalPromptTxt"></div>
+    </div>
+
+    <div class="cta">
+      <h3>E adesso? Crea la locandina per davvero 🎨</h3>
+      <ol>
+        <li><b>Copia</b> il prompt qui sopra.</li>
+        <li>Aprilo in uno strumento gratuito e <b>genera l'immagine</b>:
+          <div class="tools"><span class="tool">Canva</span><span class="tool">Gemini</span><span class="tool">Ideogram</span></div>
+        </li>
+        <li>Aggiungi il titolo, poi <b>carica la tua locandina</b> nello step successivo qui sul Digital Campus.</li>
+      </ol>
+    </div>
+
+    <div class="judge-nav">
+      <button class="btn ghost sm" onclick="backToBuild()">← Torna a modificare</button>
+      <button class="btn ghost sm" onclick="restart()">↻ Ricomincia da capo</button>
+    </div>
+  </div>
+
+  <!-- ===== STICKY LIVE PROMPT (builder only) ===== -->
+  <div class="live" id="liveBar" style="display:none">
+    <div class="live-inner">
+      <div class="lt"><span>Il tuo prompt, mentre lo costruisci</span><span id="liveCount"></span></div>
+      <div class="promptbox" id="promptbox"></div>
+    </div>
+    <div class="nav">
+      <button class="btn ghost sm" id="prevBtn" onclick="prevStep()">← Indietro</button>
+      <button class="btn sm" id="nextBtn" onclick="nextStep()">Avanti →</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+
+/* ---------------- DATA ---------------- */
+const SOGGETTI = [
+  {id:'tavolata',label:'Una tavolata conviviale e festosa',good:true},
+  {id:'mani',label:'Mani che si uniscono in cerchio',good:true},
+  {id:'barattolo',label:'Un barattolo delle donazioni con un cuore',good:true},
+  {id:'festa',label:'Una festa di comunità con luci calde',good:true},
+  {id:'cartoni',label:'Personaggi dei cartoni famosi',trap:true,
+     why:'I personaggi famosi sono protetti da copyright: non si possono usare (nemmeno «tipo» o «simili»).'},
+];
+const STILI = [
+  {id:'calda',label:'Illustrazione calda e amichevole',good:true},
+  {id:'colori',label:'Colori caldi e accoglienti',good:true},
+  {id:'semplice',label:'Stile semplice e pulito',good:true},
+  {id:'foto',label:'Fotografico e luminoso',good:true},
+  {id:'artista',label:'Stile esatto di un artista famoso',trap:true,
+     why:'Imitare lo stile dichiarato di un artista vivente è una zona rischiosa: descrivi lo stile a parole tue.'},
+];
+const PERSONE = [
+  {id:'eta',label:'Persone di età diverse',good:true},
+  {id:'etnie',label:'Persone di etnie diverse',good:true},
+  {id:'disab',label:'Una persona con disabilità',good:true},
+  {id:'vip',label:'Il volto di un personaggio famoso',trap:true,
+     why:'Usare la faccia di una persona reale senza consenso viola il suo diritto d\'immagine. Usa persone «generiche».'},
+];
+/* parole chiave a rischio copyright (per il testo libero) */
+const RISKY = ['disney','topolino','mickey','spongebob','coca','cola','nutella','barilla','esselunga','conad','mcdonald','nike','adidas','superman','batman','pikachu','marvel','ferrari','juventus','gucci'];
+
+/* ---------------- STATE ---------------- */
+const S = {
+  soggetto:{set:new Set(), custom:[]},
+  stile:{set:new Set(), custom:[]},
+  persone:{on:false, set:new Set(), custom:[]},
+  titolo:{text:'', space:false},
+};
+let step = 0;
+const TOTAL = 4;
+
+/* ---------------- BUILD PROMPT ---------------- */
+function pickLabels(data, set){ return data.filter(d=>set.has(d.id)); }
+function allRiskyHit(){
+  const words = [...S.soggetto.custom, ...S.stile.custom, ...S.persone.custom].join(' ').toLowerCase();
+  return RISKY.filter(w=>words.includes(w));
+}
+function buildPrompt(asHTML){
+  const sog = pickLabels(SOGGETTI,S.soggetto.set);
+  const sti = pickLabels(STILI,S.stile.set);
+  const per = S.persone.on ? pickLabels(PERSONE,S.persone.set) : [];
+  const wrap=(d,txt)=> (asHTML && d.trap)?'<span class="tg-word">'+txt+'</span>':txt;
+
+  const seg=['Locandina per una cena di raccolta fondi'];
+  const sogTxt=[...sog.map(d=>wrap(d,d.label.toLowerCase())), ...S.soggetto.custom];
+  if(sogTxt.length) seg.push(sogTxt.join(', '));
+  const perTxt=[...per.map(d=>wrap(d,d.label.toLowerCase())), ...S.persone.custom];
+  if(perTxt.length) seg.push(perTxt.join(', '));
+  const stiTxt=[...sti.map(d=>wrap(d,d.label.toLowerCase())), ...S.stile.custom];
+  if(stiTxt.length) seg.push('stile: '+stiTxt.join(', '));
+  if(S.titolo.space) seg.push('lascia spazio in alto per il titolo'+(S.titolo.text?(': «'+S.titolo.text+'»'):''));
+  return seg.join('. ')+'.';
+}
+function countElems(){
+  return S.soggetto.set.size+S.soggetto.custom.length+S.stile.set.size+S.stile.custom.length
+        +S.persone.set.size+S.persone.custom.length+(S.titolo.space?1:0);
+}
+function refreshLive(){
+  const n=countElems();
+  $('liveCount').textContent = n+(n===1?' elemento':' elementi');
+  $('promptbox').innerHTML = n===0
+    ? '<span class="ph">Scegli gli ingredienti: il prompt si scrive da solo…</span>'
+    : buildPrompt(true);
+}
+
+/* ---------------- RENDER STEPS ---------------- */
+function chipBlock(data, set){
+  const c=document.createElement('div'); c.className='chips';
+  data.forEach(d=>{
+    const b=document.createElement('button');
+    b.className='chip'+(d.trap?' trap':'')+(set.has(d.id)?' on':'');
+    b.textContent=d.label;
+    b.onclick=()=>{ set.has(d.id)?set.delete(d.id):set.add(d.id); b.classList.toggle('on'); refreshLive(); };
+    c.appendChild(b);
+  });
+  return c;
+}
+function customBlock(store, placeholder){
+  const box=document.createElement('div');
+  const row=document.createElement('div'); row.className='custom-row';
+  const inp=document.createElement('input'); inp.placeholder=placeholder; inp.maxLength=40;
+  const add=document.createElement('button'); add.className='btn ghost sm'; add.textContent='Aggiungi';
+  const chips=document.createElement('div'); chips.className='customchips';
+  function renderChips(){
+    chips.innerHTML='';
+    store.forEach((w,idx)=>{
+      const el=document.createElement('span'); el.className='cchip';
+      el.innerHTML=w+' ';
+      const x=document.createElement('button'); x.textContent='×';
+      x.onclick=()=>{ store.splice(idx,1); renderChips(); refreshLive(); };
+      el.appendChild(x); chips.appendChild(el);
+    });
+  }
+  function addWord(){
+    const v=inp.value.trim();
+    if(v){ store.push(v); inp.value=''; renderChips(); refreshLive(); }
+    inp.focus();
+  }
+  add.onclick=addWord;
+  inp.onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); addWord(); } };
+  row.appendChild(inp); row.appendChild(add);
+  box.appendChild(row); box.appendChild(chips); renderChips();
+  return box;
+}
+
+function renderStep(){
+  $('barFill').style.width=((step)/TOTAL*100)+'%';
+  $('barTxt').textContent='Passo '+(step+1)+' di '+TOTAL;
+  const host=$('stepHost'); host.innerHTML='';
+  const wrap=document.createElement('div'); wrap.className='step';
+
+  if(step===0){
+    wrap.innerHTML='<h2><span class="n">1</span> Cosa mostriamo?</h2><div class="hint">Il <b>soggetto</b> dell\'immagine. Scegline uno o due, poi aggiungi parole tue per renderlo unico.</div>';
+    wrap.appendChild(chipBlock(SOGGETTI,S.soggetto.set));
+    wrap.appendChild(customBlock(S.soggetto.custom,'Altre parole tue (es. candele, sorrisi, palloncini)'));
+  }
+  else if(step===1){
+    wrap.innerHTML='<h2><span class="n">2</span> Con che stile?</h2><div class="hint">Il <b>come</b>: l\'atmosfera e i colori. Una serata solidale funziona se è calda e accogliente.</div>';
+    wrap.appendChild(chipBlock(STILI,S.stile.set));
+    wrap.appendChild(customBlock(S.stile.custom,'Altro stile (es. acquerello, vintage, minimal)'));
+  }
+  else if(step===2){
+    wrap.innerHTML='<h2><span class="n">3</span> Mettiamo delle persone?</h2><div class="hint">Facoltativo. Ma se le metti, la locandina deve parlare a <b>tutta</b> la comunità.</div>';
+    const tgRow=document.createElement('div'); tgRow.className='toggle-row';
+    const tg=document.createElement('button'); tg.className='tg'+(S.persone.on?' on':'');
+    const lab=document.createElement('span'); lab.className='tg-label'; lab.textContent='Sì, includi delle persone';
+    const coll=document.createElement('div'); coll.className='collapse'+(S.persone.on?' show':'');
+    coll.appendChild(chipBlock(PERSONE,S.persone.set));
+    coll.appendChild(customBlock(S.persone.custom,'Altro (es. famiglie, bambini che giocano)'));
+    tg.onclick=()=>{ S.persone.on=!S.persone.on; tg.classList.toggle('on'); coll.classList.toggle('show',S.persone.on);
+       if(!S.persone.on){ S.persone.set.clear(); S.persone.custom.length=0; } refreshLive(); };
+    tgRow.appendChild(tg); tgRow.appendChild(lab);
+    wrap.appendChild(tgRow); wrap.appendChild(coll);
+  }
+  else if(step===3){
+    wrap.innerHTML='<h2><span class="n">4</span> Il titolo</h2><div class="hint">Trucco da grafico: chiedi all\'AI di <b>lasciare spazio</b> per il titolo, che aggiungerai dopo (su Canva).</div>';
+    const tgRow=document.createElement('div'); tgRow.className='toggle-row';
+    const tg=document.createElement('button'); tg.className='tg'+(S.titolo.space?' on':'');
+    const lab=document.createElement('span'); lab.className='tg-label'; lab.textContent='Lascia spazio in alto per il titolo';
+    tg.onclick=()=>{ S.titolo.space=!S.titolo.space; tg.classList.toggle('on'); refreshLive(); };
+    tgRow.appendChild(tg); tgRow.appendChild(lab);
+    const tf=document.createElement('div'); tf.className='titlefield';
+    tf.innerHTML='<label>Che titolo metterai? (lo aggiungerai dopo nell\'immagine)</label>';
+    const inp=document.createElement('input'); inp.value=S.titolo.text||'Cena di raccolta fondi — sabato, ore 20';
+    inp.oninput=()=>{ S.titolo.text=inp.value; refreshLive(); };
+    S.titolo.text=inp.value; tf.appendChild(inp);
+    wrap.appendChild(tgRow); wrap.appendChild(tf);
+  }
+  host.appendChild(wrap);
+
+  $('prevBtn').disabled = (step===0);
+  $('nextBtn').textContent = (step===TOTAL-1)?'Vedi il giudizio →':'Avanti →';
+  refreshLive();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ---------------- NAV ---------------- */
+function start(){ $('intro').style.display='none'; $('builder').style.display='block'; $('liveBar').style.display='block'; step=0; renderStep(); }
+function prevStep(){ if(step>0){ step--; renderStep(); } }
+function nextStep(){ if(step<TOTAL-1){ step++; renderStep(); } else judge(); }
+function backToBuild(){ $('judge').style.display='none'; $('builder').style.display='block'; $('liveBar').style.display='block'; renderStep(); }
+function restart(){
+  S.soggetto={set:new Set(),custom:[]}; S.stile={set:new Set(),custom:[]};
+  S.persone={on:false,set:new Set(),custom:[]}; S.titolo={text:'',space:false};
+  $('judge').style.display='none'; $('intro').style.display='block'; window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ---------------- JUDGE ---------------- */
+function judge(){
+  $('builder').style.display='none'; $('liveBar').style.display='none'; $('judge').style.display='block';
+
+  const sogGood=pickLabels(SOGGETTI,S.soggetto.set).filter(d=>d.good).length + S.soggetto.custom.length;
+  const stiGood=pickLabels(STILI,S.stile.set).filter(d=>d.good).length + S.stile.custom.length;
+  const perGood=pickLabels(PERSONE,S.persone.set).filter(d=>d.good).length + S.persone.custom.length;
+  const chipTraps=[...pickLabels(SOGGETTI,S.soggetto.set),...pickLabels(STILI,S.stile.set),...pickLabels(PERSONE,S.persone.set)].filter(d=>d.trap);
+  const riskyWords=allRiskyHit();
+  const ethicsOk = chipTraps.length===0 && riskyWords.length===0;
+
+  const crits=[]; let pass=0, totalC=0;
+  const add=(type,t,d)=>{ crits.push([type,t,d]); totalC++; if(type==='ok')pass++; };
+
+  add(sogGood>0?'ok':'no','Soggetto chiaro', sogGood>0?'Hai detto cosa mostrare: l\'AI sa da dove partire.':'Manca il soggetto: senza, l\'AI tira a indovinare.');
+  add(stiGood>0?'ok':'warn','Stile definito', stiGood>0?'Hai indicato l\'atmosfera: è il «come» del prompt.':'Aggiungi uno stile: cambia tutto il risultato.');
+  add(S.titolo.space?'ok':'warn','Spazio per il titolo', S.titolo.space?'Furbo: l\'immagine lascia posto al testo.':'Senza spazio, il titolo finirà sopra l\'immagine.');
+  if(S.persone.on){
+    add(perGood>0?'ok':'no','Diversità', perGood>0?'Hai chiesto persone diverse: la locandina parla a tutti.':'Hai messo persone ma non la diversità: rischi di escludere qualcuno.');
+  } else {
+    add('ok','Persone','Nessuna persona: scelta valida, nessun rischio di rappresentazione.');
+  }
+  if(ethicsOk) add('ok','Diritti e copyright','Niente marchi, personaggi o volti famosi. Pubblicabile senza pensieri.');
+  else {
+    const items=[...chipTraps.map(t=>'«'+t.label+'» — '+t.why), ...riskyWords.map(w=>'«'+w+'» sembra un marchio o un personaggio protetto: meglio toglierlo.')];
+    add('no','Attenzione ai diritti', items.join('  '));
+  }
+  const personal = (S.soggetto.custom.length+S.stile.custom.length+S.persone.custom.length)>0;
+  if(personal) add('ok','Tocco personale','Hai aggiunto parole tue: il prompt è più ricco e originale. Bravo.');
+
+  // verdict
+  const ratio = pass/totalC;
+  const badge=$('vbadge');
+  let cls,emoji,t,s;
+  if(ethicsOk && sogGood>0 && stiGood>0 && (!S.persone.on || perGood>0)){ cls='good';emoji='★';t='Prompt pronto da usare!';s='Completo, chiaro e rispettoso. Puoi generare la tua locandina.'; }
+  else if(!ethicsOk){ cls='low';emoji='!';t='Bel prompt, ma occhio ai diritti';s='La parte creativa c\'è. Togli gli elementi protetti e sei a posto per pubblicare.'; }
+  else if(ratio>=.6){ cls='mid';emoji='~';t='Ci siamo quasi';s='Buona base. Sistema i punti in giallo e diventa perfetto.'; }
+  else { cls='low';emoji='~';t='Da completare';s='Rileggi i suggerimenti: bastano due o tre aggiunte.'; }
+  badge.className='vbadge '+cls; badge.textContent=emoji;
+  $('vTitle').textContent=t; $('vSub').textContent=s;
+
+  // criteria
+  const c=$('crit'); c.innerHTML='';
+  crits.forEach(([type,title,desc])=>{
+    const sym=type==='ok'?'✓':type==='no'?'✕':'!';
+    c.insertAdjacentHTML('beforeend','<div class="row"><div class="ic '+type+'">'+sym+'</div><div><div class="ct">'+title+'</div><div class="cd">'+desc+'</div></div></div>');
+  });
+
+  // final prompt (plain)
+  $('finalPromptTxt').textContent = '«'+buildPrompt(false)+'»';
+  const cb=$('copyBtn'); cb.className='copybtn'; cb.textContent='📋 Copia';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function copyPrompt(){
+  const txt = buildPrompt(false);
+  const done=()=>{ const cb=$('copyBtn'); cb.className='copybtn done'; cb.textContent='✓ Copiato'; };
+  if(navigator.clipboard){ navigator.clipboard.writeText(txt).then(done).catch(fallback); }
+  else fallback();
+  function fallback(){ const ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy');}catch(e){} ta.remove(); done(); }
+}
+</script>
+</body>
+</html>
