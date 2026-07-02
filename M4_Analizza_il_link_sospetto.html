@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Caso n°7: il premio fantasma — AI per la vita quotidiana</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Special+Elite&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#E2001A; --red-dk:#B5001A;
+  --olive:#A3B644; --olive-dk:#7D8E2F;
+  --ink:#1E1E1D; --black:#111110;
+  --night:#0F0E0C; --night-2:#1A1815;
+  --paper:#F7F3EA; --paper-2:#EFE8D8;
+  --gray:#6B6B68; --g200:#E2E2E0; --g100:#EFEFEE;
+  --ok:#1f8a3b; --ok-bg:#e9f7ee;
+  --no:#E2001A; --no-bg:#fdecee;
+  --warn:#b06a00; --warn-bg:#fff6e6;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:'Inter',system-ui,sans-serif;color:var(--ink);
+  background:
+    radial-gradient(1200px 600px at 70% -10%, rgba(226,0,26,.14), transparent 60%),
+    radial-gradient(900px 500px at 10% 110%, rgba(163,182,68,.10), transparent 60%),
+    linear-gradient(180deg, var(--night) 0%, var(--night-2) 100%);
+  min-height:100%;line-height:1.5;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:780px;margin:0 auto;padding:26px 16px 90px}
+
+/* ============ COMMON ============ */
+.kick{display:inline-flex;align-items:center;gap:8px;background:var(--red);color:#fff;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;padding:7px 14px;border-radius:999px}
+.kick::before{content:"";width:7px;height:7px;border-radius:50%;background:#fff;animation:blink 1.6s infinite}
+@keyframes blink{50%{opacity:.3}}
+.btn{font-family:inherit;font-size:16px;font-weight:800;border-radius:999px;padding:14px 32px;border:3px solid var(--black);cursor:pointer;transition:.12s;background:var(--red);color:#fff;box-shadow:0 5px 0 var(--black)}
+.btn:hover{transform:translateY(2px);box-shadow:0 3px 0 var(--black)}
+.btn:active{transform:translateY(5px);box-shadow:0 0 0 var(--black)}
+.btn.ghost{background:var(--paper);color:var(--ink)}
+.btn.sm{font-size:14px;padding:11px 22px;box-shadow:0 4px 0 var(--black)}
+.screen{display:none;animation:fadeUp .4s ease}
+.screen.on{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ============ CASE FILE CARD ============ */
+.case{
+  background:var(--paper);border:3px solid var(--black);border-radius:16px;
+  box-shadow:0 10px 0 rgba(0,0,0,.55), 0 30px 60px rgba(0,0,0,.5);
+  padding:26px 26px 24px;position:relative;overflow:hidden;
+}
+.case::before{ /* punched holes */
+  content:"";position:absolute;top:0;left:26px;right:26px;height:8px;
+  background:radial-gradient(circle at 8px 4px, var(--night) 4px, transparent 5px) repeat-x;
+  background-size:40px 8px;opacity:.18;
+}
+.stamp{
+  position:absolute;top:18px;right:18px;transform:rotate(8deg);
+  font-family:'Special Elite',monospace;font-size:13px;letter-spacing:.14em;
+  color:var(--red);border:3px double var(--red);border-radius:8px;padding:6px 12px;
+  text-transform:uppercase;opacity:.85;background:rgba(255,255,255,.4);
+}
+.case h1{font-size:34px;font-weight:900;letter-spacing:-.02em;line-height:1.06;margin:14px 0 4px}
+.case h1 .ac{color:var(--red)}
+.case .typew{font-family:'Special Elite',monospace;font-size:14.5px;color:#4a463c;margin:12px 0}
+.case .lead{font-size:15.5px;color:#3d3a33;margin:10px 0 6px}
+.dossier{background:#fff;border:2px dashed #c9c2b0;border-radius:12px;padding:16px 18px;margin:16px 0}
+.dossier .dt{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin-bottom:8px}
+.dossier p{font-size:14.5px;color:#33302a}
+.dossier b{color:var(--ink)}
+
+/* ============ HUD (clue bar) ============ */
+.hud{
+  position:sticky;top:10px;z-index:40;margin-bottom:16px;
+  background:rgba(17,17,16,.92);backdrop-filter:blur(8px);
+  border:2px solid rgba(255,255,255,.12);border-radius:14px;
+  padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.hud .hl{font-size:10.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#9a968e}
+.hud .slots{display:flex;gap:8px}
+.slot{
+  display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:#8a867e;
+  border:2px dashed #4a463f;border-radius:999px;padding:5px 12px;transition:.25s;
+}
+.slot.done{color:#fff;background:var(--red);border:2px solid var(--red);animation:stampIn .35s ease}
+@keyframes stampIn{0%{transform:scale(1.4) rotate(-8deg)}100%{transform:none}}
+.hud .stars{font-size:13px;color:#F5C56B;letter-spacing:2px;white-space:nowrap}
+
+/* ============ PHONE ============ */
+.stage{display:flex;flex-direction:column;align-items:center;gap:18px}
+.hintbar{
+  display:inline-flex;align-items:center;gap:9px;background:rgba(245,197,107,.13);
+  border:1.5px solid rgba(245,197,107,.4);color:#F5C56B;border-radius:999px;
+  padding:9px 18px;font-size:13.5px;font-weight:600;
+}
+.phone{
+  width:min(360px,92vw);background:#0c0b0a;border-radius:42px;padding:14px 12px 18px;
+  border:3px solid #2c2a26;box-shadow:0 24px 70px rgba(0,0,0,.65), inset 0 0 0 2px #000;
+  position:relative;
+}
+.notch{width:110px;height:22px;background:#000;border-radius:0 0 14px 14px;margin:0 auto 6px}
+.pscreen{background:#F4F2EE;border-radius:26px;overflow:hidden;min-height:520px;display:flex;flex-direction:column}
+.pbar{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:700;color:#555;padding:8px 16px 4px}
+.pheader{
+  text-align:center;padding:8px 12px 10px;border-bottom:1px solid #e3e0da;background:#fbfaf7;
+}
+.avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#d8d3c8,#b9b2a3);margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:19px}
+.sname{font-size:13.5px;font-weight:800}
+.snum{font-size:10.5px;color:#8b877e}
+.chat{flex:1;padding:16px 14px;display:flex;flex-direction:column;gap:10px}
+.bubble{
+  background:#fff;border:1.5px solid #e2ded6;border-radius:16px 16px 16px 5px;
+  padding:12px 14px;font-size:13.8px;line-height:1.55;max-width:95%;
+  box-shadow:0 2px 6px rgba(0,0,0,.05);
+}
+.bubble .link{color:#1565c0;text-decoration:underline;word-break:break-all}
+.time{font-size:10px;color:#a09b90;margin-top:4px}
+/* hotspots */
+.hs{position:relative;cursor:zoom-in;border-radius:8px;transition:.15s}
+.hs:hover{background:rgba(226,0,26,.08)}
+.hs::after{
+  content:"";position:absolute;top:50%;right:-14px;width:9px;height:9px;border-radius:50%;
+  background:var(--red);transform:translateY(-50%);
+  box-shadow:0 0 0 0 rgba(226,0,26,.5);animation:pulse 1.8s infinite;
+}
+.hs.found{cursor:default}
+.hs.found:hover{background:transparent}
+.hs.found::after{background:var(--olive-dk);animation:none;content:"";box-shadow:none}
+.hs.found::before{
+  content:"✓";position:absolute;top:50%;right:-22px;transform:translateY(-50%);
+  color:var(--olive-dk);font-weight:900;font-size:13px;
+}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(226,0,26,.5)}70%{box-shadow:0 0 0 12px rgba(226,0,26,0)}100%{box-shadow:0 0 0 0 rgba(226,0,26,0)}}
+.hl-urg{background:#ffe9a8;border-radius:4px;padding:0 2px}
+.gonext{margin-top:4px}
+
+/* ============ MODAL (enigma) ============ */
+.overlay{
+  position:fixed;inset:0;background:rgba(10,9,8,.78);backdrop-filter:blur(5px);
+  display:none;align-items:flex-start;justify-content:center;z-index:100;overflow-y:auto;padding:30px 14px;
+}
+.overlay.on{display:flex}
+.modal{
+  background:var(--paper);border:3px solid var(--black);border-radius:18px;
+  max-width:560px;width:100%;padding:24px 24px 22px;position:relative;
+  box-shadow:0 14px 0 rgba(0,0,0,.5);animation:fadeUp .3s ease;
+}
+.mtag{font-family:'Special Elite',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin-bottom:8px}
+.modal h3{font-size:21px;font-weight:900;letter-spacing:-.01em;line-height:1.25;margin-bottom:8px}
+.evidence{
+  background:#fff;border:2px solid #d9d3c4;border-radius:12px;padding:13px 15px;margin:12px 0;
+  font-size:14px;color:#33302a;
+}
+.evidence .ev-k{font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#8b8578;margin-bottom:4px}
+.evidence .mono{font-family:'Special Elite',monospace;font-size:14.5px}
+.mq{font-size:15.5px;font-weight:700;margin:14px 0 10px}
+.mopts{display:flex;flex-direction:column;gap:9px}
+.mopt{
+  text-align:left;font-family:inherit;font-size:14.5px;font-weight:600;color:var(--ink);
+  background:#fff;border:2px solid var(--g200);border-radius:12px;padding:13px 16px 13px 46px;
+  cursor:pointer;transition:.12s;position:relative;
+}
+.mopt .mk{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:24px;height:24px;border-radius:50%;border:2px solid var(--g200);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12.5px;color:var(--gray);background:#fff}
+.mopt:hover:not(.lock){border-color:var(--red)}
+.mopts.locked .mopt{cursor:default}
+.mopt.right{border-color:var(--ok);background:var(--ok-bg)}
+.mopt.right .mk{background:var(--ok);border-color:var(--ok);color:#fff}
+.mopt.wrong{border-color:var(--no);background:var(--no-bg)}
+.mopt.wrong .mk{background:var(--no);border-color:var(--no);color:#fff}
+.mopt.dim{opacity:.55}
+.mfb{display:none;margin-top:14px;border-radius:12px;padding:14px 16px;animation:fadeUp .25s ease}
+.mfb.on{display:block}
+.mfb.good{background:var(--ok-bg);border-left:5px solid var(--ok)}
+.mfb.bad{background:var(--no-bg);border-left:5px solid var(--no)}
+.mfb .ft{font-weight:800;font-size:14.5px;margin-bottom:4px}
+.mfb.good .ft{color:var(--ok)} .mfb.bad .ft{color:var(--no)}
+.mfb .fd{font-size:13.8px;color:#333}
+.mclose{margin-top:16px;display:none;justify-content:flex-end}
+.mclose.on{display:flex}
+
+/* ============ URL DISSECTOR ============ */
+.urlbox{
+  background:var(--night);border-radius:12px;padding:18px 16px;margin:12px 0 4px;
+  display:flex;flex-wrap:wrap;gap:6px;justify-content:center;
+}
+.urlseg{
+  font-family:'Special Elite',monospace;font-size:15.5px;color:#e8e4da;
+  background:#262320;border:2px solid #3a362f;border-radius:8px;padding:8px 10px;
+  cursor:pointer;transition:.12s;
+}
+.urlseg:hover:not(.lock){border-color:#F5C56B;transform:translateY(-2px)}
+.urlseg.right{background:var(--ok);border-color:var(--ok);color:#fff}
+.urlseg.wrong{background:var(--red-dk);border-color:var(--red);color:#fff;animation:shake .3s}
+.urlseg.lock{cursor:default}
+@keyframes shake{0%,100%{transform:none}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.urlhint{text-align:center;font-size:12.5px;color:#7d786d;margin-top:6px}
+
+/* ============ QUICK ROUND ============ */
+.linkcards{display:flex;flex-direction:column;gap:11px;margin:14px 0}
+.linkcard{
+  text-align:left;font-family:inherit;background:#fff;border:2px solid var(--g200);
+  border-radius:14px;padding:15px 17px;cursor:pointer;transition:.12s;
+}
+.linkcard:hover:not(.lock){border-color:var(--red)}
+.linkcard .lc-url{font-family:'Special Elite',monospace;font-size:14.5px;word-break:break-all;margin-bottom:4px}
+.linkcard .lc-src{font-size:12.5px;color:var(--gray)}
+.linkcard.right{border-color:var(--ok);background:var(--ok-bg)}
+.linkcard.wrong{border-color:var(--no);background:var(--no-bg)}
+.linkcard.dim{opacity:.55}
+.linkcards.locked .linkcard{cursor:default}
+
+/* ============ VERDICT ============ */
+.badge{
+  width:130px;height:130px;border-radius:50%;margin:6px auto 12px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  border:4px solid var(--black);box-shadow:0 8px 0 rgba(0,0,0,.4);
+  font-size:44px;background:linear-gradient(135deg,#F5C56B,#E2861A);
+  animation:stampIn .5s ease;
+}
+.badge.gold{background:linear-gradient(135deg,#F5C56B,#E2861A)}
+.badge.silver{background:linear-gradient(135deg,#d9d9d7,#a8a8a5)}
+.badge.train{background:linear-gradient(135deg,#A3B644,#7D8E2F)}
+.vstars{text-align:center;font-size:22px;letter-spacing:4px;color:#E2861A;margin-bottom:4px}
+.rules{background:#fff;border:2px dashed #c9c2b0;border-radius:12px;padding:6px 18px;margin:16px 0}
+.rules .row{display:flex;gap:11px;padding:11px 0;border-bottom:1px solid #eee8da;font-size:14px}
+.rules .row:last-child{border-bottom:none}
+.rules .n{font-family:'Special Elite',monospace;color:var(--red);font-weight:700;flex-shrink:0}
+.reallife{background:var(--warn-bg);border-left:5px solid #e8941c;border-radius:12px;padding:15px 17px;margin:14px 0;font-size:14px}
+.reallife .rt{font-weight:800;color:var(--warn);margin-bottom:5px;font-size:14.5px}
+.center{text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ================= HUD ================= -->
+  <div class="hud" id="hud" style="display:none">
+    <span class="hl">🔍 Indizi</span>
+    <div class="slots">
+      <span class="slot" id="sl-mittente">Mittente</span>
+      <span class="slot" id="sl-testo">Messaggio</span>
+      <span class="slot" id="sl-link">Link</span>
+    </div>
+    <span class="stars" id="hudStars">☆☆☆☆☆</span>
+  </div>
+
+  <!-- ================= SCREEN: INTRO ================= -->
+  <div class="screen on" id="s-intro">
+    <div class="case">
+      <span class="stamp">Riservato</span>
+      <span class="kick">Modulo 4 · Indagine interattiva</span>
+      <h1>Caso n°7: <span class="ac">il premio fantasma.</span></h1>
+      <p class="typew">Ora: 17:42 — Un telefono vibra, da qualche parte in Italia…</p>
+      <p class="lead">Roberto ha ricevuto un SMS: un premio fedeltà da 500€ che scade tra 24 ore. Sembra vero. Forse lo è. Forse no.</p>
+      <div class="dossier">
+        <div class="dt">La tua missione</div>
+        <p>Vesti i panni del <b>detective digitale</b>: esamina il messaggio <b>senza mai aprire il link</b>, raccogli i 3 indizi, smonta l'URL pezzo per pezzo e decidi la mossa finale. Ogni enigma risolto al primo colpo vale una ⭐.</p>
+      </div>
+      <div class="center" style="margin-top:18px">
+        <button class="btn" onclick="go('s-phone');showHud()">Apri il caso →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= SCREEN: PHONE ================= -->
+  <div class="screen" id="s-phone">
+    <div class="stage">
+      <span class="hintbar">🔍 Tocca le <b>&nbsp;3 zone sospette&nbsp;</b> del telefono per indagare</span>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="pscreen">
+          <div class="pbar"><span>17:42</span><span>📶 5G &nbsp;🔋 41%</span></div>
+          <div class="pheader hs" id="hs-mittente" onclick="openEnigma('mittente')">
+            <div class="avatar">🎁</div>
+            <div class="sname">CoopPremi</div>
+            <div class="snum">numero sconosciuto</div>
+          </div>
+          <div class="chat">
+            <div>
+              <div class="bubble">
+                <span class="hs" id="hs-testo" onclick="openEnigma('testo')">Gentile socio, il suo <b>premio fedeltà di 500€</b> è in scadenza. <span class="hl-urg">Confermi i suoi dati ENTRO 24 ORE</span> o il premio sarà <span class="hl-urg">definitivamente annullato</span>.</span><br><br>
+                Verifica subito qui:<br>
+                <span class="hs link" id="hs-link" onclick="openEnigma('link')">https://www.coop.it.premio-soci.xyz/accedi</span>
+              </div>
+              <div class="time">SMS · adesso</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="gonext" id="phoneNext" style="visibility:hidden">
+        <button class="btn" onclick="go('s-decision')">Ho i 3 indizi: decido la mossa →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= SCREEN: DECISION ================= -->
+  <div class="screen" id="s-decision">
+    <div class="case">
+      <span class="stamp">Enigma 4</span>
+      <span class="kick">La mossa finale</span>
+      <h1>E se il premio fosse <span class="ac">vero?</span></h1>
+      <p class="lead">Il messaggio puzza di truffa da tutte le parti. Ma Roberto ha un dubbio: «e se la Coop mi avesse davvero riservato un premio?». Come lo scopri <b>senza correre nessun rischio</b>?</p>
+      <div class="mopts" id="decOpts" style="margin-top:14px"></div>
+      <div class="mfb" id="decFb"><div class="ft"></div><div class="fd"></div></div>
+      <div class="mclose" id="decNext"><button class="btn" onclick="go('s-quick')">Ultima prova →</button></div>
+    </div>
+  </div>
+
+  <!-- ================= SCREEN: QUICK ROUND ================= -->
+  <div class="screen" id="s-quick">
+    <div class="case">
+      <span class="stamp">Prova finale</span>
+      <span class="kick">Occhio da detective</span>
+      <h1>Tre link, <span class="ac">uno solo</span> è quello vero.</h1>
+      <p class="lead">Esame finale: quale di questi tre porta <b>davvero</b> al sito della Coop? Leggi il dominio — il pezzo prima della prima barra — da destra verso sinistra.</p>
+      <div class="linkcards" id="quickCards"></div>
+      <div class="mfb" id="quickFb"><div class="ft"></div><div class="fd"></div></div>
+      <div class="mclose" id="quickNext"><button class="btn" onclick="verdict()">Chiudi il caso →</button></div>
+    </div>
+  </div>
+
+  <!-- ================= SCREEN: VERDICT ================= -->
+  <div class="screen" id="s-verdict">
+    <div class="case">
+      <span class="stamp">Caso chiuso</span>
+      <div class="center">
+        <div class="badge" id="vBadge">🕵️</div>
+        <div class="vstars" id="vStars"></div>
+        <h1 id="vTitle" style="font-size:30px">—</h1>
+        <p class="lead" id="vSub">—</p>
+      </div>
+      <div class="rules">
+        <div class="row"><span class="n">01</span><span>Il <b>nome del mittente si può falsificare</b>: non dice niente su chi scrive davvero.</span></div>
+        <div class="row"><span class="n">02</span><span>L'<b>urgenza è una leva</b>: «entro 24 ore» serve a non farti pensare. Fermati.</span></div>
+        <div class="row"><span class="n">03</span><span>Il <b>vero dominio</b> è l'ultimo blocco prima della prima barra <span style="font-family:'Special Elite',monospace">/</span> — tutto ciò che c'è prima può essere una recita.</span></div>
+        <div class="row"><span class="n">04</span><span><b>Mai dal link:</b> se il dubbio resta, scrivi tu l'indirizzo ufficiale o apri l'app che già conosci.</span></div>
+      </div>
+      <div class="reallife">
+        <div class="rt">E nella vita vera, con un SMS così?</div>
+        Non rispondere e non cliccare. <b>Segnala come spam</b>, <b>blocca il numero</b>, <b>elimina</b>. E se il messaggio sembra della tua banca o di un servizio che usi: fermati, riaggancia, verifica dal canale ufficiale.
+      </div>
+      <div class="center" style="margin-top:16px">
+        <button class="btn ghost sm" onclick="location.reload()">↻ Riapri il caso</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ================= MODAL ================= -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="mtag" id="mTag">Indizio</div>
+    <h3 id="mTitle">—</h3>
+    <div id="mEvidence"></div>
+    <div class="mq" id="mQ"></div>
+    <div class="mopts" id="mOpts"></div>
+    <div id="mUrl"></div>
+    <div class="mfb" id="mFb"><div class="ft"></div><div class="fd"></div></div>
+    <div class="mclose" id="mClose"><button class="btn sm" onclick="closeModal()">Segna l'indizio ✓</button></div>
+  </div>
+</div>
+
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+
+/* ================= STATE ================= */
+const state={ clues:{mittente:false,testo:false,link:false}, stars:0, current:null };
+const MAXSTARS=5;
+
+function showHud(){ $('hud').style.display='flex'; }
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  $(id).classList.add('on');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function addStar(){ state.stars++; renderStars(); }
+function renderStars(){
+  $('hudStars').textContent='★'.repeat(state.stars)+'☆'.repeat(MAXSTARS-state.stars);
+}
+renderStars();
+
+/* ================= ENIGMI (indizi telefono) ================= */
+const ENIGMAS={
+  mittente:{
+    tag:'Indizio 1 / 3 — Il mittente',
+    title:'Chi ha scritto, davvero?',
+    evidence:'<div class="evidence"><div class="ev-k">Scheda del contatto</div><p>Nome visualizzato: <b>«CoopPremi»</b><br>Numero reale: <span class="mono">+44&nbsp;7911&nbsp;22••58</span> <b>(Regno Unito)</b><br>In rubrica: <b>no</b> · Messaggi precedenti: <b>nessuno</b></p></div>',
+    q:'Il nome dice «CoopPremi», ma il numero è un cellulare estero. Che conclusione trai?',
+    opts:[
+      {t:'Sarà la sede europea della Coop: le grandi aziende hanno numeri esteri.',ok:false,
+       fb:'Le comunicazioni ufficiali ai soci non arrivano da cellulari esteri sconosciuti. E soprattutto: il nome non prova niente.'},
+      {t:'Il nome del mittente si può impostare a piacere: è il primo segnale di allarme.',ok:true,
+       fb:'Esatto. Chi manda un SMS può scriverci il nome che vuole, «CoopPremi» incluso. Il nome visualizzato non è mai una prova.'},
+      {t:'Se il nome contiene «Coop», il telefono ha già verificato che è autentico.',ok:false,
+       fb:'Purtroppo no: il telefono mostra il nome che il mittente ha scelto. Nessuno lo verifica per te.'},
+    ]
+  },
+  testo:{
+    tag:'Indizio 2 / 3 — Il messaggio',
+    title:'Le parole che mettono fretta.',
+    evidence:'<div class="evidence"><div class="ev-k">Frasi evidenziate</div><p class="mono">«ENTRO 24 ORE» · «definitivamente annullato» · «verifica subito»</p></div>',
+    q:'Ti ricordi i tre campanelli d\'allarme del video? Qui quale sta suonando più forte?',
+    opts:[
+      {t:'L\'urgenza: una scadenza pressante per impedirti di ragionare.',ok:true,
+       fb:'Proprio così. La fretta è l\'arma numero uno del truffatore: un premio vero non evapora in 24 ore, e nessun ente serio ti mette con le spalle al muro.'},
+      {t:'Nessuno: le promozioni hanno sempre una scadenza, è normale marketing.',ok:false,
+       fb:'Le promozioni vere hanno scadenze, sì — ma non ti minacciano di «annullamento definitivo» via SMS con un link da cliccare subito. Qui suona il campanello dell\'urgenza.'},
+      {t:'Il canale: gli SMS sono sempre truffe, qualunque cosa dicano.',ok:false,
+       fb:'Non esageriamo: esistono SMS legittimi. Il punto non è il canale in sé, ma l\'urgenza costruita per farti agire d\'impulso.'},
+    ]
+  },
+};
+
+/* Il terzo indizio è il dissettore di URL */
+const URLSEGS=[
+  {t:'https://',ok:false,fb:'Il lucchetto dice solo che la connessione è cifrata, non che il sito è onesto. Anche i truffatori usano https. Riprova: cerca il blocco subito prima della prima barra «/».'},
+  {t:'www.coop.it.',ok:false,fb:'Trappola! Questo è solo un sottodominio: chi possiede il dominio vero può scriverci davanti quello che vuole — anche «coop.it». Riprova: guarda subito prima della «/».'},
+  {t:'premio-soci.xyz',ok:true,fb:'Bravissimo, detective. Il dominio vero è l\'ultimo blocco prima della prima «/»: premio-soci.xyz. Il sito non ha niente a che fare con coop.it — la parte a sinistra era solo scenografia.'},
+  {t:'/accedi',ok:false,fb:'Questo è il percorso interno del sito: puoi scriverci qualsiasi cosa. La vera identità sta nel blocco prima della «/». Riprova.'},
+];
+
+function openEnigma(key){
+  state.current=key;
+  if(state.clues[key]) return; // già risolto
+  $('mFb').className='mfb'; $('mClose').className='mclose';
+  $('mOpts').innerHTML=''; $('mUrl').innerHTML=''; $('mQ').textContent='';
+
+  if(key==='link'){
+    $('mTag').textContent='Indizio 3 / 3 — Il link';
+    $('mTitle').textContent='Smonta l\'indirizzo, pezzo per pezzo.';
+    $('mEvidence').innerHTML='<div class="evidence"><div class="ev-k">Regola del detective</div><p>Un indirizzo si legge <b>da destra</b>: il <b>vero dominio</b> è l\'ultimo blocco prima della prima barra <span class="mono">/</span>. Tutto quello che sta più a sinistra… può essere una messinscena.</p></div>';
+    $('mQ').textContent='Tocca il pezzo che decide DAVVERO dove finirai:';
+    const box=document.createElement('div'); box.className='urlbox';
+    let solved=false, firstTry=true;
+    URLSEGS.forEach(s=>{
+      const b=document.createElement('button'); b.className='urlseg'; b.textContent=s.t;
+      b.onclick=()=>{
+        if(solved) return;
+        const fb=$('mFb');
+        if(s.ok){
+          solved=true; b.classList.add('right');
+          box.querySelectorAll('.urlseg').forEach(x=>x.classList.add('lock'));
+          fb.className='mfb on good';
+          fb.querySelector('.ft').textContent=firstTry?'Indizio decisivo! ⭐':'Indizio decisivo!';
+          fb.querySelector('.fd').textContent=s.fb;
+          if(firstTry) addStar();
+          markClue('link');
+          $('mClose').className='mclose on';
+        }else{
+          firstTry=false;
+          b.classList.add('wrong'); setTimeout(()=>b.classList.remove('wrong'),450);
+          const fb2=$('mFb'); fb2.className='mfb on bad';
+          fb2.querySelector('.ft').textContent='Non è lui…';
+          fb2.querySelector('.fd').textContent=s.fb;
+        }
+      };
+      box.appendChild(b);
+    });
+    $('mUrl').appendChild(box);
+    const h=document.createElement('div'); h.className='urlhint'; h.textContent='Suggerimento: parti dalla barra «/» e fai un passo a sinistra.';
+    $('mUrl').appendChild(h);
+  }else{
+    const E=ENIGMAS[key];
+    $('mTag').textContent=E.tag;
+    $('mTitle').textContent=E.title;
+    $('mEvidence').innerHTML=E.evidence;
+    $('mQ').textContent=E.q;
+    renderOpts($('mOpts'),E.opts,{
+      onRight:(first)=>{ if(first) addStar(); markClue(key); $('mClose').className='mclose on'; },
+      fbEl:$('mFb'), starOnFirst:true
+    });
+  }
+  $('overlay').classList.add('on');
+}
+function closeModal(){ $('overlay').classList.remove('on'); }
+$('overlay').addEventListener('click',e=>{ if(e.target===$('overlay') && $('mClose').classList.contains('on')) closeModal(); });
+
+function markClue(key){
+  state.clues[key]=true;
+  $('sl-'+key).classList.add('done');
+  const hsId = key==='mittente'?'hs-mittente':key==='testo'?'hs-testo':'hs-link';
+  $(hsId).classList.add('found');
+  if(state.clues.mittente && state.clues.testo && state.clues.link){
+    $('phoneNext').style.visibility='visible';
+  }
+}
+
+/* Generic multiple-choice renderer */
+function renderOpts(container,opts,cfg){
+  let answered=false, firstTry=true;
+  container.innerHTML='';
+  opts.forEach((o,i)=>{
+    const b=document.createElement('button'); b.className='mopt';
+    b.innerHTML='<span class="mk">'+String.fromCharCode(65+i)+'</span>'+o.t;
+    b.onclick=()=>{
+      if(answered) return;
+      const fb=cfg.fbEl;
+      if(o.ok){
+        answered=true; container.classList.add('locked');
+        [...container.children].forEach((el,idx)=>{
+          if(opts[idx].ok){ el.classList.add('right'); el.querySelector('.mk').textContent='✓'; }
+          else el.classList.add('dim');
+        });
+        fb.className='mfb on good';
+        fb.querySelector('.ft').textContent=firstTry?'Giusto! ⭐':'Giusto!';
+        fb.querySelector('.fd').textContent=o.fb;
+        cfg.onRight(firstTry);
+      }else{
+        firstTry=false;
+        b.classList.add('wrong'); b.querySelector('.mk').textContent='✕';
+        setTimeout(()=>{b.classList.add('dim')},350);
+        fb.className='mfb on bad';
+        fb.querySelector('.ft').textContent='Non proprio…';
+        fb.querySelector('.fd').textContent=o.fb;
+      }
+    };
+    container.appendChild(b);
+  });
+}
+
+/* ================= ENIGMA 4 — DECISIONE ================= */
+const DECISION=[
+  {t:'Apro il link ma velocissimo, giusto per sbirciare, poi chiudo subito.',ok:false,
+   fb:'«Solo per sbirciare» è come aprire la porta al truffatore «solo un attimo». Basta un tocco per finire su una pagina che ruba dati. Il link non si apre: punto.'},
+  {t:'Scrivo io coop.it nel browser (o apro l\'app che già uso) e controllo lì se il premio esiste.',ok:true,
+   fb:'Perfetto. Il canale ufficiale è la sola strada sicura: se il premio è vero, lo trovi lì. Se lì non c\'è… il caso è chiuso: era una truffa.'},
+  {t:'Rispondo all\'SMS chiedendo: «siete davvero la Coop?»',ok:false,
+   fb:'Chi ha scritto il messaggio ti risponderà «certo che sì!». E in più avrà la conferma che il tuo numero è attivo. Non si risponde: si verifica per conto proprio.'},
+];
+renderOpts($('decOpts'),DECISION,{ onRight:(first)=>{ if(first) addStar(); $('decNext').className='mclose on'; }, fbEl:$('decFb') });
+
+/* ================= QUICK ROUND ================= */
+const QUICK=[
+  {url:'https://coop-it.club/premi',src:'Arrivato via SMS da numero sconosciuto',ok:false,
+   fb:'Il dominio è «coop-it.club»: un dominio inventato che scimmiotta quello vero. Il trattino e il «.club» lo tradiscono.'},
+  {url:'https://www.coop.it/soci/premi',src:'Scritto da te nella barra del browser',ok:true,
+   fb:'Esatto: il dominio è coop.it — quello vero — e soprattutto l\'indirizzo l\'hai digitato tu, non l\'hai ricevuto. Doppia sicurezza.'},
+  {url:'https://bit.ly/premio-soci-2026',src:'Arrivato via WhatsApp da un gruppo',ok:false,
+   fb:'È un link accorciato: non puoi sapere dove porta finché non lo apri — ed è proprio questo il problema. Nel dubbio, non si apre.'},
+];
+(function renderQuick(){
+  const host=$('quickCards');
+  let answered=false;
+  QUICK.forEach((q,i)=>{
+    const b=document.createElement('button'); b.className='linkcard';
+    b.innerHTML='<div class="lc-url">'+q.url+'</div><div class="lc-src">📍 '+q.src+'</div>';
+    b.onclick=()=>{
+      if(answered) return;
+      answered=true; host.classList.add('locked');
+      [...host.children].forEach((el,idx)=>{
+        if(QUICK[idx].ok) el.classList.add('right'); else if(idx===i) el.classList.add('wrong'); else el.classList.add('dim');
+      });
+      const fb=$('quickFb');
+      if(q.ok){
+        addStar();
+        fb.className='mfb on good';
+        fb.querySelector('.ft').textContent='Occhio infallibile! ⭐';
+      }else{
+        fb.className='mfb on bad';
+        fb.querySelector('.ft').textContent='Quello sbagliato…';
+      }
+      fb.querySelector('.fd').textContent=q.fb+(q.ok?'':' Quello sicuro era www.coop.it/soci/premi: dominio vero e scritto da te.');
+      $('quickNext').className='mclose on';
+    };
+    host.appendChild(b);
+  });
+})();
+
+/* ================= VERDICT ================= */
+function verdict(){
+  go('s-verdict');
+  const s=state.stars;
+  $('vStars').textContent='★'.repeat(s)+'☆'.repeat(MAXSTARS-s);
+  const b=$('vBadge'),t=$('vTitle'),sub=$('vSub');
+  if(s===5){ b.className='badge gold'; b.textContent='🕵️'; t.textContent='Detective Capo del Web!'; sub.textContent='Cinque su cinque al primo colpo: nessun link ti frega più. Insegnalo anche a chi ami.'; }
+  else if(s>=4){ b.className='badge gold'; b.textContent='🔍'; t.textContent='Ispettore di prima classe'; sub.textContent='Occhio finissimo. Riguarda l\'unico passaggio incerto e sei perfetto.'; }
+  else if(s>=2){ b.className='badge silver'; b.textContent='🧐'; t.textContent='Agente promettente'; sub.textContent='Le basi ci sono. Rileggi le quattro regole del taccuino e riapri il caso.'; }
+  else { b.className='badge train'; b.textContent='📖'; t.textContent='Recluta in addestramento'; sub.textContent='Nessun problema: si impara indagando. Riapri il caso e riprova — stavolta leggi l\'URL da destra.'; }
+}
+</script>
+</body>
+</html>
