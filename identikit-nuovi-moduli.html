@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Identikit Personaggi — Nuovi Moduli Settembre</title>
+<style>
+  :root {
+    --coop-red: #E30613;
+    --coop-green: #A2C617;
+    --bg: #FAF8F3;
+    --card: #FFFFFF;
+    --ink: #1A1A1A;
+    --ink-soft: #555;
+    --line: #E5E2DA;
+    --shadow: 0 2px 12px rgba(0,0,0,0.05);
+    --shadow-hover: 0 8px 24px rgba(0,0,0,0.1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    font-size: 16px;
+  }
+
+  /* Header */
+  header {
+    background: linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%);
+    color: white;
+    padding: 60px 24px 80px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--coop-red), var(--coop-green));
+  }
+  header h1 {
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+  }
+  header h1 .accent { color: var(--coop-green); }
+  header .subtitle {
+    font-size: clamp(14px, 2vw, 18px);
+    opacity: 0.85;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+  header .meta {
+    margin-top: 24px;
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    font-size: 13px;
+    opacity: 0.7;
+  }
+  header .meta span {
+    padding: 4px 12px;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 999px;
+  }
+
+  /* Container */
+  .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+
+  /* Nav */
+  nav.toc {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 24px;
+    margin-top: -40px;
+    box-shadow: var(--shadow);
+    position: relative;
+    z-index: 10;
+    margin-bottom: 60px;
+  }
+  nav.toc h3 {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-soft);
+    margin-bottom: 14px;
+  }
+  nav.toc ul { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
+  nav.toc a {
+    display: inline-block;
+    padding: 8px 16px;
+    background: var(--bg);
+    color: var(--ink);
+    text-decoration: none;
+    border-radius: 999px;
+    font-size: 14px;
+    border: 1px solid var(--line);
+    transition: all 0.2s;
+  }
+  nav.toc a:hover { background: var(--ink); color: white; border-color: var(--ink); }
+  nav.toc a.expert { border-color: var(--coop-green); }
+  nav.toc a.expert:hover { background: var(--coop-green); border-color: var(--coop-green); }
+
+  /* Section labels */
+  .section-label {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink-soft);
+    margin: 60px 0 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--line);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-label .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--coop-green);
+  }
+  .section-label.experts .dot { background: var(--coop-red); }
+
+  /* Card */
+  .character-card {
+    background: var(--card);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 32px;
+    box-shadow: var(--shadow);
+    transition: box-shadow 0.3s;
+    scroll-margin-top: 20px;
+  }
+  .character-card:hover { box-shadow: var(--shadow-hover); }
+  .card-inner {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 0;
+  }
+  @media (max-width: 768px) {
+    .card-inner { grid-template-columns: 1fr; }
+  }
+
+  /* Image */
+  .portrait {
+    position: relative;
+    background: linear-gradient(135deg, #F0EDE5 0%, #E5E2DA 100%);
+    min-height: 320px;
+    overflow: hidden;
+    align-self: start;
+  }
+  .portrait img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .portrait .placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: var(--ink-soft);
+    font-size: 14px;
+    text-align: center;
+    padding: 20px;
+  }
+  .portrait .placeholder svg {
+    width: 60px; height: 60px;
+    opacity: 0.3;
+    margin-bottom: 12px;
+  }
+  .badge-role {
+    position: absolute;
+    top: 16px; left: 16px;
+    background: rgba(0,0,0,0.75);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    backdrop-filter: blur(8px);
+    z-index: 2;
+  }
+  .badge-role.expert { background: var(--coop-red); }
+  .badge-role.expert::before { content: '★ '; }
+
+  /* Content */
+  .content { padding: 32px; }
+  .content h2 {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    margin-bottom: 4px;
+  }
+  .content .nickname {
+    color: var(--ink-soft);
+    font-size: 16px;
+    font-style: italic;
+    margin-bottom: 4px;
+  }
+  .content .module-tag {
+    display: inline-block;
+    background: var(--coop-green);
+    color: var(--ink);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .module-tag.expert { background: var(--coop-red); color: white; }
+
+  /* Quick info row */
+  .quick-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 16px;
+    padding: 20px;
+    background: var(--bg);
+    border-radius: 12px;
+    margin-bottom: 24px;
+  }
+  .quick-info div {
+    font-size: 14px;
+  }
+  .quick-info .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+    margin-bottom: 2px;
+  }
+  .quick-info .value { font-weight: 600; }
+
+  /* Sections */
+  .section-block { margin-bottom: 20px; }
+  .section-block h3 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--coop-red);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-block h3::before {
+    content: '';
+    width: 24px;
+    height: 2px;
+    background: var(--coop-red);
+  }
+  .section-block.expert h3 { color: var(--coop-green); }
+  .section-block.expert h3::before { background: var(--coop-green); }
+  .section-block p { font-size: 15px; color: var(--ink); }
+  .section-block ul { margin-left: 20px; font-size: 14px; }
+  .section-block li { margin-bottom: 4px; }
+
+  /* Curiosities */
+  .curiosities {
+    background: linear-gradient(135deg, #FFF9E6 0%, #FFF3CC 100%);
+    border-left: 4px solid #F5C518;
+    padding: 16px 20px;
+    border-radius: 8px;
+    margin-top: 16px;
+  }
+  .curiosities h4 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #8B6914;
+    margin-bottom: 8px;
+  }
+  .curiosities ul { list-style: none; margin: 0; }
+  .curiosities li {
+    font-size: 14px;
+    padding-left: 24px;
+    position: relative;
+    margin-bottom: 6px;
+  }
+  .curiosities li::before {
+    content: '💡';
+    position: absolute;
+    left: 0;
+    font-size: 14px;
+  }
+
+  /* Quote */
+  .quote {
+    font-style: italic;
+    color: var(--ink-soft);
+    border-left: 3px solid var(--ink);
+    padding: 12px 18px;
+    margin: 16px 0;
+    background: var(--bg);
+    border-radius: 0 8px 8px 0;
+    font-size: 15px;
+  }
+  .quote::before { content: '"'; font-size: 24px; color: var(--coop-red); margin-right: 4px; }
+  .quote::after { content: '"'; font-size: 24px; color: var(--coop-red); margin-left: 4px; }
+
+  /* Footer */
+  footer {
+    background: var(--ink);
+    color: white;
+    padding: 40px 24px;
+    text-align: center;
+    margin-top: 80px;
+    font-size: 14px;
+    opacity: 0.9;
+  }
+  footer a { color: var(--coop-green); text-decoration: none; }
+
+  /* Asset gallery */
+  .assets { background: var(--card); border-radius:20px; padding:32px; box-shadow: var(--shadow); margin-bottom:32px; }
+  .assets h3 { font-size:20px; font-weight:800; margin-bottom:6px; }
+  .assets > p { font-size:14px; color:var(--ink-soft); margin-bottom:24px; }
+  .asset-row { margin-bottom:28px; }
+  .asset-row h4 { font-size:13px; text-transform:uppercase; letter-spacing:.1em; color:var(--coop-red); margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+  .asset-row h4::before { content:''; width:24px; height:2px; background:var(--coop-red); }
+  .asset-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:16px; }
+  .asset { border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--bg); }
+  .asset img { width:100%; height:230px; object-fit:contain; display:block; background:#EFECE4; }
+  .asset .cap { padding:10px 12px; font-size:12px; }
+  .asset .cap b { display:block; font-size:13px; margin-bottom:2px; }
+  .asset .cap code { font-size:11px; color:var(--ink-soft); word-break:break-all; }
+  .variant-note { background:#EEF6FF; border-left:4px solid #2C7BCF; padding:14px 18px; border-radius:8px; margin-top:16px; font-size:14px; }
+  .variant-note b { color:#1A5FA8; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Nuovi <span class="accent">Personaggi</span></h1>
+  <p class="subtitle">AI per la vita quotidiana — Personas dei nuovi moduli di settembre: Lingue straniere e Autoformazione</p>
+  <div class="meta">
+    <span>2 nuovi protagonisti</span>
+    <span>3 avatar HeyGen</span>
+    <span>2 esperti ricorrenti</span>
+    <span>Moduli 5 &amp; 6</span>
+    <span>Estensione del cast</span>
+  </div>
+</header>
+
+<div class="container">
+
+<nav class="toc">
+  <h3>Nuovo cast</h3>
+  <ul>
+    <li><a href="#fatima">Fatima · M5</a></li>
+    <li><a href="#enzo">Enzo · M6</a></li>
+    <li><a href="PREPARAZIONE/identikit.html" class="expert">★ Cast esistente (M1-M4)</a></li>
+  </ul>
+</nav>
+
+<div class="section-label"><span class="dot"></span>Nuovi protagonisti — Moduli 5 e 6</div>
+
+<!-- FATIMA -->
+<article id="fatima" class="character-card">
+  <div class="card-inner">
+    <div class="portrait">
+      <span class="badge-role">Modulo 5</span>
+      <img src="personaggi-reference/fatima-velo.png" alt="Fatima El Mansouri" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div class="placeholder" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        Immagine in generazione
+      </div>
+    </div>
+    <div class="content">
+      <h2>Fatima El Mansouri</h2>
+      <p class="nickname">La studentessa-cameriera · 28 anni · Torino</p>
+      <span class="module-tag">M5 · Lingue straniere: il coach digitale</span>
+
+      <div class="quick-info">
+        <div><div class="label">Professione</div><div class="value">Studentessa di Economia + cameriera</div></div>
+        <div><div class="label">Origini</div><div class="value">Nata a Torino, famiglia marocchina</div></div>
+        <div><div class="label">Tech-level</div><div class="value">Pratica, usa il telefono per tutto</div></div>
+        <div><div class="label">Rapporto Coop</div><div class="value">Socia da 4 anni, attenta alle offerte</div></div>
+      </div>
+
+      <div class="section-block">
+        <h3>Problema scatenante</h3>
+        <p>Un gruppo di turisti le chiede un consiglio sul menù e lei — che quella frase la sa perfettamente — <strong>si blocca</strong>. Risponde a monosillabi indicando il piatto col dito, e il collega interviene al posto suo. Quella sera cerca «corso conversazione inglese Torino prezzi» e chiude subito la pagina: <strong>30-40€ l'ora</strong> sono fuori portata.</p>
+      </div>
+
+      <div class="section-block">
+        <h3>Soluzione AI</h3>
+        <p><strong>Il coach digitale di conversazione</strong>: sessioni vocali interattive a costo zero, simulazioni di dialoghi reali (ristorante, aeroporto, colloquio), correzioni istantanee calibrate sul proprio livello. Un partner d'ascolto <strong>instancabile e paziente</strong> che non giudica mai.</p>
+      </div>
+
+      <div class="section-block">
+        <h3>Carattere</h3>
+        <ul>
+          <li>Solare e diretta, con l'ironia tipica torinese</li>
+          <li>Ambiziosa ma pragmatica: si è pagata gli studi lavorando</li>
+          <li>Perfezionista timida — preferisce tacere piuttosto che sbagliare davanti agli altri</li>
+          <li>Curiosa di tecnologia, ma la usa in modo pratico</li>
+        </ul>
+      </div>
+
+      <div class="section-block">
+        <h3>Il nodo del personaggio</h3>
+        <p>L'inglese lo <strong>capisce bene</strong>: legge, guarda le serie, scrive mail decenti. Il problema è <strong>aprire bocca</strong>. La sua battaglia non è imparare l'inglese: è <strong>liberare quello che già sa</strong>. Ansia da prestazione, non ignoranza.</p>
+      </div>
+
+      <div class="section-block">
+        <h3>Aspetto fisico</h3>
+        <p>1.68m, corporatura snella, portamento energico. Viso ovale con zigomi pronunciati, occhi marroni scuri molto espressivi, sorriso ampio. Capelli castano scuro lunghi e ondulati, raccolti sotto un <strong>hijab moderato color crema</strong> che lascia il <strong>viso interamente scoperto</strong>. Pelle olivastra mediterranea. Piccoli orecchini a cerchio dorati. Gesticola mentre parla.</p>
+      </div>
+
+      <div class="quote">L'inglese lo so. È che quando devo parlarlo mi si chiude la gola.</div>
+
+      <div class="curiosities">
+        <h4>Curiosità &amp; dettagli</h4>
+        <ul>
+          <li>Vive in un appartamento condiviso a San Salvario, Torino</li>
+          <li>Bilingue italiano-arabo fin da bambina</li>
+          <li>Lavora nei turni serali di un bistrot del centro: turisti ogni giorno</li>
+          <li>Ha provato le app di lingue: la annoiano, sono quiz e non conversazione</li>
+          <li>Si «allena» a bassa voce in tram con gli auricolari</li>
+          <li>Arco emotivo: blocco → vergogna → scoperta → primi tentativi → sicurezza</li>
+        </ul>
+      </div>
+
+      <div class="section-block" style="margin-top:20px">
+        <h3>Nota anti-stereotipo</h3>
+        <p>Fatima <strong>non</strong> è «la ragazza straniera che non parla italiano». È italiana, nata e cresciuta a Torino, universitaria. La sua difficoltà con l'inglese è la stessa di milioni di italiani: il <strong>blocco psicologico nel parlare</strong>.</p>
+      </div>
+      <div class="variant-note">
+        <b>Variante adottata: con hijab.</b> La versione <b>con hijab moderato</b> è quella <b>adottata per il corso</b>: foulard color crema che lascia il viso interamente scoperto, in uno stile contemporaneo ed elegante. Resta disponibile anche la variante <b>senza velo</b> con lo <b>stesso identico volto</b>, da usare solo se la direzione editoriale dovesse cambiare. Vedi la galleria asset in fondo alla pagina.
+      </div>
+
+    </div>
+  </div>
+</article>
+
+<!-- ENZO -->
+<article id="enzo" class="character-card">
+  <div class="card-inner">
+    <div class="portrait">
+      <span class="badge-role">Modulo 6</span>
+      <img src="personaggi-reference/enzo.png" alt="Enzo Caracciolo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div class="placeholder" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        Immagine in generazione
+      </div>
+    </div>
+    <div class="content">
+      <h2>Enzo Caracciolo</h2>
+      <p class="nickname">L'insegnante che non ha smesso di imparare · 55 anni · Napoli</p>
+      <span class="module-tag">M6 · Formazione e autoformazione con l'AI</span>
+
+      <div class="quick-info">
+        <div><div class="label">Professione</div><div class="value">Ex insegnante, in ricollocamento</div></div>
+        <div><div class="label">Famiglia</div><div class="value">Sposato, una figlia all'università</div></div>
+        <div><div class="label">Tech-level</div><div class="value">Competente ma non «smanettone»</div></div>
+        <div><div class="label">Rapporto Coop</div><div class="value">Socio da 20 anni</div></div>
+      </div>
+
+      <div class="section-block">
+        <h3>Problema scatenante</h3>
+        <p>Scarica il manuale di certificazione: <strong>centosessanta pagine in inglese</strong>. Le legge tutte in una settimana, diligentemente. Poi fa una simulazione d'esame e ne sbaglia più della metà. Non perché non abbia capito: perché <strong>leggere non è imparare</strong>. Si sente stupido, e a 55 anni brucia il doppio.</p>
+      </div>
+
+      <div class="section-block">
+        <h3>Soluzione AI</h3>
+        <p><strong>Il tutor didattico personale</strong>: non chiedere risposte preconfezionate, ma impostare l'Intelligenza Artificiale perché <strong>interroghi</strong>. Quiz di riepilogo, mappe concettuali, simulazioni di sfide logiche, esercizi graduati. Studio <strong>attivo</strong> invece che passivo.</p>
+      </div>
+
+      <div class="section-block">
+        <h3>Carattere</h3>
+        <ul>
+          <li>Colto e curioso, ma senza spocchia: ama spiegare, non impressionare</li>
+          <li>Metodico — prende appunti a mano, sottolinea, schematizza</li>
+          <li>Autoironico sul proprio «essere fuori tempo massimo»</li>
+          <li>Dignitoso: si vergogna un po' di ricominciare a 55 anni</li>
+        </ul>
+      </div>
+
+      <div class="section-block">
+        <h3>Il nodo del personaggio</h3>
+        <p>Ha insegnato per venticinque anni: sa studiare, eccome. Quello che gli manca è ciò che <strong>lui dava ai suoi studenti ogni giorno</strong>: qualcuno che lo interroghi. La sua intuizione: <em>se l'Intelligenza Artificiale può rispondere alle domande, allora può anche farle</em>. Si sta formando su <strong>Scrum</strong> e metodologie agili per lavorare nella formazione aziendale.</p>
+      </div>
+
+      <div class="section-block">
+        <h3>Aspetto fisico</h3>
+        <p>1.76m, corporatura robusta, portamento composto. Viso squadrato con lineamenti morbidi, occhi marroni caldi e intelligenti. Capelli <strong>grigio brizzolato</strong> corti, leggermente stempiato, barba curata sale e pepe. <strong>Occhiali</strong> con montatura sottile scura, che abbassa quando parla. Penna sempre in mano.</p>
+      </div>
+
+      <div class="quote">Per venticinque anni ho interrogato io gli altri. Adesso avevo bisogno che qualcuno interrogasse me.</div>
+
+      <div class="curiosities">
+        <h4>Curiosità &amp; dettagli</h4>
+        <ul>
+          <li>Vive al Vomero, Napoli, in un appartamento pieno di libri</li>
+          <li>Appassionato di storia: la coltiva con lo stesso metodo attivo</li>
+          <li>Ha smesso di mettere la cravatta il giorno della pensione anticipata</li>
+          <li>Quaderno con appunti scritti fitti, sempre accanto al laptop</li>
+          <li>Fa la spesa lui: «è il mio momento di pace»</li>
+          <li>Arco emotivo: fatica → frustrazione → intuizione → metodo → padronanza</li>
+        </ul>
+      </div>
+
+      <div class="section-block" style="margin-top:20px">
+        <h3>Nota anti-stereotipo</h3>
+        <p>Enzo <strong>non</strong> è «l'anziano che non capisce la tecnologia». È un intellettuale curioso con una solida cultura umanistica. Il suo limite non è l'età: è la <strong>noia dello studio passivo</strong>.</p>
+      </div>
+    </div>
+  </div>
+</article>
+
+
+<div class="section-label"><span class="dot"></span>Asset visivi disponibili</div>
+
+<div class="assets">
+  <h3>Immagini di riferimento e avatar</h3>
+  <p>Le reference verticali 3:4 servono come <strong>seed</strong> per generare le scene con Veo/Kling. Gli avatar orizzontali 16:9 sono ottimizzati per <strong>HeyGen</strong>: posa frontale, sguardo in camera, luce uniforme sul volto, sfondo sfocato.</p>
+
+  <div class="asset-row">
+    <h4>Fatima · con hijab moderato — in uso</h4>
+    <div class="asset-grid">
+      <div class="asset"><img src="personaggi-reference/fatima-velo.png" alt="Fatima con velo reference"><div class="cap"><b>Reference 3:4</b><code>personaggi-reference/fatima-velo.png</code></div></div>
+      <div class="asset"><img src="personaggi-reference-16x9/fatima-velo-avatar-16x9.png" alt="Fatima con velo avatar HeyGen"><div class="cap"><b>Avatar HeyGen 16:9</b><code>personaggi-reference-16x9/fatima-velo-avatar-16x9.png</code></div></div>
+    </div>
+  </div>
+
+  <div class="asset-row">
+    <h4>Fatima · senza velo — variante alternativa</h4>
+    <div class="asset-grid">
+      <div class="asset"><img src="personaggi-reference/fatima.png" alt="Fatima reference"><div class="cap"><b>Reference 3:4</b><code>personaggi-reference/fatima.png</code></div></div>
+      <div class="asset"><img src="personaggi-reference-16x9/fatima-avatar-16x9.png" alt="Fatima avatar HeyGen"><div class="cap"><b>Avatar HeyGen 16:9</b><code>personaggi-reference-16x9/fatima-avatar-16x9.png</code></div></div>
+    </div>
+  </div>
+
+  <div class="asset-row" style="margin-bottom:0">
+    <h4>Enzo</h4>
+    <div class="asset-grid">
+      <div class="asset"><img src="personaggi-reference/enzo.png" alt="Enzo reference"><div class="cap"><b>Reference 3:4</b><code>personaggi-reference/enzo.png</code></div></div>
+      <div class="asset"><img src="personaggi-reference-16x9/enzo-avatar-16x9.png" alt="Enzo avatar HeyGen"><div class="cap"><b>Avatar HeyGen 16:9</b><code>personaggi-reference-16x9/enzo-avatar-16x9.png</code></div></div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<footer>
+  <p><strong>AI per la vita quotidiana</strong> · Nuovi personaggi settembre · Produzione EIIS per Coop</p>
+  <p style="margin-top:8px;opacity:0.7">Estensione del cast esistente (Carlo, Marta, Maria, Paola, Luca, Roberto). Avatar generati con AI per garantire consistenza visiva tra moduli.</p>
+</footer>
+
+</body>
+</html>
